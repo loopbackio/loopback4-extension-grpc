@@ -5,9 +5,9 @@
 import {expect} from '@loopback/testlab';
 import {inject} from '@loopback/context';
 import {Application} from '@loopback/core';
-import {GrpcSequenceInterface, GrpcConfig, UnaryCall, UnaryReply} from '../../';
+import {GrpcSequenceInterface, GrpcConfig} from '../../';
 import {grpc} from '../../src/decorators/grpc.decorator';
-import * as grpcModule from 'grpc';
+import * as gRPC from 'grpc';
 import {GrpcComponent, GrpcBindings} from '../..';
 import {
   GreeterInterface,
@@ -66,7 +66,7 @@ describe('GrpcComponent', () => {
         @inject(GrpcBindings.CONTEXT) protected context,
         @inject(GrpcBindings.GRPC_METHOD) protected method,
       ) {}
-      async unaryCall(call: UnaryCall): Promise<UnaryReply> {
+      async unaryCall(call: gRPC.ServerUnaryCall): Promise<HelloReply> {
         // Do something before call
         const reply = await this.method(call.request);
         reply.message += ' Sequenced';
@@ -113,7 +113,7 @@ function getGrpcClient(app: Application) {
   const proto = protoProvider();
   return new proto.Greeter(
     `${app.getSync(GrpcBindings.HOST)}:${app.getSync(GrpcBindings.PORT)}`,
-    grpcModule.credentials.createInsecure(),
+    gRPC.credentials.createInsecure(),
   );
 }
 /**

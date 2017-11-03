@@ -3,7 +3,6 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 //import {Provider} from '@loopback/context';
-import {GrpcServerInstance} from '../types';
 // Require gRPC Module
 import * as grpc from 'grpc';
 /**
@@ -13,8 +12,8 @@ import * as grpc from 'grpc';
  * @description This provider will return the GRPC Server
  */
 export class ServerProvider {
-  private server: GrpcServerInstance = new grpc.Server();
-  public value(): GrpcServerInstance {
+  private server: grpc.Server = new grpc.Server();
+  public value(): grpc.Server {
     return this.server;
   }
 }
