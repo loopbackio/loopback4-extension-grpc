@@ -5,7 +5,7 @@
 import {expect} from '@loopback/testlab';
 import {inject} from '@loopback/context';
 import {Application} from '@loopback/core';
-import {GrpcSequenceInterface, GrpcConfig, UnaryCall, UnaryReply} from '../../';
+import {GrpcSequenceInterface, GrpcConfig} from '../../';
 import {grpc} from '../../src/decorators/grpc.decorator';
 import * as grpcModule from 'grpc';
 import {GrpcComponent, GrpcBindings} from '../..';
@@ -32,7 +32,7 @@ describe('GrpcComponent', () => {
     class Greeter implements GreeterInterface {
       // Tell LoopBack that this is a Service RPC implementation
       @grpc()
-      SayHello(request: HelloRequest): HelloReply {
+      sayHello(request: HelloRequest): HelloReply {
         const reply: HelloReply = {message: 'Hello ' + request.name};
         return reply;
       }
@@ -56,7 +56,7 @@ describe('GrpcComponent', () => {
     class Greeter implements GreeterInterface {
       // Tell LoopBack that this is a Service RPC implementation
       @grpc()
-      SayHello(request: HelloRequest): HelloReply {
+      sayHello(request: HelloRequest): HelloReply {
         const reply: HelloReply = {message: 'Hello ' + request.name};
         return reply;
       }
@@ -66,7 +66,7 @@ describe('GrpcComponent', () => {
         @inject(GrpcBindings.CONTEXT) protected context,
         @inject(GrpcBindings.GRPC_METHOD) protected method,
       ) {}
-      async unaryCall(call: UnaryCall): Promise<UnaryReply> {
+      async unaryCall(call: grpcModule.ServerUnaryCall): Promise<HelloReply> {
         // Do something before call
         const reply = await this.method(call.request);
         reply.message += ' Sequenced';

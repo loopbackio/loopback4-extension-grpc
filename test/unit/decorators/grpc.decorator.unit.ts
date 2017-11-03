@@ -16,7 +16,7 @@ describe('@rpc decorator', () => {
   it('defines reflection metadata for rpc method', () => {
     class Greeter implements GreeterInterface {
       @grpc()
-      SayHello(request: HelloRequest): HelloReply {
+      sayHello(request: HelloRequest): HelloReply {
         return {message: `hello ${request.name}`};
       }
       Helper(): boolean {
@@ -36,6 +36,6 @@ describe('@rpc decorator', () => {
       );
       if (enabled) flags[methodName] = enabled;
     }
-    expect(flags).to.deepEqual({SayHello: true});
+    expect(flags).to.deepEqual({sayHello: true});
   });
 });

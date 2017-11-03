@@ -1,6 +1,6 @@
 import {inject} from '@loopback/context';
 import {GrpcBindings} from './keys';
-import {UnaryCall, UnaryReply} from './types';
+import * as grpc from 'grpc';
 /**
  * @interface GrpcSequenceInterface
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -8,7 +8,7 @@ import {UnaryCall, UnaryReply} from './types';
  * @description Interface that describes a GRPC Sequence
  */
 export interface GrpcSequenceInterface {
-  unaryCall(request: UnaryCall): Promise<UnaryReply>;
+  unaryCall(request: grpc.ServerUnaryCall): Promise<any>;
 }
 /**
  * @class GrpcSequence
@@ -22,7 +22,7 @@ export class GrpcSequence implements GrpcSequenceInterface {
     @inject(GrpcBindings.GRPC_METHOD) protected method,
   ) {}
 
-  async unaryCall(call: UnaryCall): Promise<UnaryReply> {
+  async unaryCall(call: grpc.ServerUnaryCall): Promise<any> {
     // Do something before call
     const reply = await this.method(call.request);
     // Do something after call
