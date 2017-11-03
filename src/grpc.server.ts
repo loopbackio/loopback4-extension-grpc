@@ -1,8 +1,14 @@
 import {Application, CoreBindings, Server} from '@loopback/core';
 import {Context, inject, Reflector} from '@loopback/context';
 import {GrpcBindings} from './keys';
+<<<<<<< HEAD
 import {GrpcSequence} from './grpc.sequence';
 import * as grpc from 'grpc';
+=======
+import {GrpcServerInstance, UnaryReply, UnaryCall} from './types';
+import {GrpcSequence} from './grpc.sequence';
+import * as grpcModule from 'grpc';
+>>>>>>> master
 const debug = require('debug')('loopback:grpc:server');
 /**
  * @class GrpcServer

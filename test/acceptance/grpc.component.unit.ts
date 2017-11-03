@@ -5,9 +5,15 @@
 import {expect} from '@loopback/testlab';
 import {inject} from '@loopback/context';
 import {Application} from '@loopback/core';
+<<<<<<< HEAD
 import {GrpcSequenceInterface, GrpcConfig} from '../../';
 import {grpc} from '../../src/decorators/grpc.decorator';
 import * as gRPC from 'grpc';
+=======
+import {GrpcSequenceInterface, GrpcConfig, UnaryCall, UnaryReply} from '../../';
+import {grpc} from '../../src/decorators/grpc.decorator';
+import * as grpcModule from 'grpc';
+>>>>>>> master
 import {GrpcComponent, GrpcBindings} from '../..';
 import {
   GreeterInterface,
