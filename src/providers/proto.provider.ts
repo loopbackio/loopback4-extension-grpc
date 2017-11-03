@@ -4,8 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 import {inject} from '@loopback/context';
 import {GrpcBindings} from '../keys';
-// Require gRPC Module
-const grpc = require('grpc');
+import * as grpc from 'grpc';
 /**
  * @class ProtoProvider
  * @author Jonathan Casarrubias <t: johncasarrubias>

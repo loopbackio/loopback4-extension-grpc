@@ -1,9 +1,8 @@
 import {Application, CoreBindings, Server} from '@loopback/core';
 import {Context, inject, Reflector} from '@loopback/context';
 import {GrpcBindings} from './keys';
-import {GrpcServerInstance, UnaryReply, UnaryCall} from './types';
 import {GrpcSequence} from './grpc.sequence';
-import * as grpcModule from 'grpc';
+import * as grpc from 'grpc';
 const debug = require('debug')('loopback:grpc:server');
 /**
  * @class GrpcServer
@@ -27,7 +26,7 @@ export class GrpcServer extends Context implements Server {
        */
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) protected app: Application,
-    @inject(GrpcBindings.GRPC_SERVER) protected server: GrpcServerInstance,
+    @inject(GrpcBindings.GRPC_SERVER) protected server: grpc.Server,
     @inject(GrpcBindings.HOST) protected host: string,
     @inject(GrpcBindings.PORT) protected port: string,
     @inject(GrpcBindings.PROTO_PROVIDER) protected protoProvider: any,
@@ -49,7 +48,7 @@ export class GrpcServer extends Context implements Server {
     return new Promise<void>((resolve, reject) => {
       this.server.bind(
         `${this.host}:${this.port}`,
-        grpcModule.ServerCredentials.createInsecure(),
+        grpc.ServerCredentials.createInsecure(),
       );
       this.server.start();
       resolve();
@@ -68,7 +67,7 @@ export class GrpcServer extends Context implements Server {
     if (!proto) {
       throw new Error(`Grpc Server: No proto file was provided.`);
     }
-    const handlers: {[key: string]: Function} = {};
+    const handlers: {[key: string]: grpc.handleCall} = {};
     const className = prototype.constructor.name || '<UnknownClass>';
     // If this class is defined within the proto file
     // then we search for rpc methods and register handlers.
@@ -101,9 +100,12 @@ export class GrpcServer extends Context implements Server {
    * @param prototype 
    * @param methodName 
    */
-  private setupGrpcCall(prototype, methodName: string): Function {
+  private setupGrpcCall(prototype, methodName: string): grpc.handleCall {
     const context: Context = this;
-    return function(call: UnaryCall, callback: (err, value?) => void) {
+    return function(
+      call: grpc.ServerUnaryCall,
+      callback: (err, value?) => void,
+    ) {
       handleUnary().then(
         result => callback(null, result),
         error => {
@@ -111,7 +113,7 @@ export class GrpcServer extends Context implements Server {
           callback(error);
         },
       );
-      async function handleUnary(): Promise<UnaryReply> {
+      async function handleUnary(): Promise<any> {
         context.bind(GrpcBindings.CONTEXT).to(context);
         context.bind(GrpcBindings.GRPC_METHOD).to(prototype[methodName]);
         const sequence: GrpcSequence = await context.get(
