@@ -9,5 +9,5 @@ export interface HelloReply {
   message: string;
 }
 export interface GreeterInterface {
-  SayHello(request: HelloRequest): HelloReply;
+  sayHello(request: HelloRequest): HelloReply;
 }
