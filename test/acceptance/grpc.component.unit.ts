@@ -9,11 +9,7 @@ import {GrpcSequenceInterface, GrpcConfig} from '../../';
 import {grpc} from '../../src/decorators/grpc.decorator';
 import * as grpcModule from 'grpc';
 import {GrpcComponent, GrpcBindings} from '../..';
-import {
-  GreeterInterface,
-  HelloRequest,
-  HelloReply,
-} from '../protos/greeter.proto';
+import {GreeterInterface, HelloRequest, HelloReply} from '../protos/greeter_pb';
 
 const pkg: string = 'greeterpackage';
 const file: string = './test/protos/greeter.proto';

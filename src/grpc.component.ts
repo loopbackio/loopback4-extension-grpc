@@ -16,6 +16,7 @@ import {ServerProvider} from './providers/server.provider';
 import {GrpcServer} from './grpc.server';
 import {GrpcSequence} from './grpc.sequence';
 import {GrpcConfig} from './types';
+import {GeneratorProvider} from './providers/generator.provider';
 /**
  * @class Grpc Component
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -29,6 +30,7 @@ export class GrpcComponent implements Component {
   providers: ProviderMap = {
     [GrpcBindings.GRPC_SERVER]: ServerProvider,
     [GrpcBindings.PROTO_PROVIDER]: ProtoProvider,
+    [GrpcBindings.GRPC_GENERATOR]: GeneratorProvider,
   };
   /**
    * Export Grpc Server
@@ -58,3 +60,5 @@ export class GrpcComponent implements Component {
     }
   }
 }
+
+///Volumes/BACKUP/development/loopback/loopback4-extension-grpc/test/protoc/bin/protoc --js_out import_style=commonjs,binary:/Volumes/BACKUP/development/loopback/loopback4-extension-grpc/generated -I /Volumes/BACKUP/development/loopback/loopback4-extension-grpc/ /Volumes/BACKUP/development/loopback/loopback4-extension-grpc/test/protos/*.proto

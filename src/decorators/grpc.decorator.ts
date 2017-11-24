@@ -10,18 +10,23 @@ import {GrpcBindings} from '../keys';
  * @param params
  * @license MIT
  * @description This decorator provides a way to
- * configure GRPC Micro Services within LoopBack 4 
- * 
+ * configure GRPC Micro Services within LoopBack 4
+ *
  * Example of usage:
- * 
+ *
  * myproject/controllers/Greeter.ts
- * 
- * class Greeter {
- *   @grpc
- *   public sayHello(call, callback) {
- *      callback(null, {message: 'Hello ' + call.request.name});
+ *
+ * import { Greeter } from 'greeter_pb_service.ts';
+ * import { HelloRequest, HelloResponse } from 'greeter_pb.d.ts';
+ *
+ * class MyGreeter {
+ *   @grpc(Greeter.SayHello)
+ *   public sayHello(request: HelloRequest): HelloResponse {
+ *     const response: HelloResponse = new HelloResponse();
+ *     response.setMessage('Hello ' + call.request.name);
+ *     return response;
  *   }
- * } 
+ * }
  */
 export function grpc() {
   return function(target: object, propertyKey: string) {

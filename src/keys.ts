@@ -12,6 +12,7 @@ export namespace GrpcBindings {
   export const GRPC_CONTROLLER = 'grpc.controller';
   export const GRPC_METHOD = 'grpc.method';
   export const GRPC_METHOD_NAME = 'grpc.method.name';
+  export const GRPC_GENERATOR = 'grpc.generator';
   export const CONTEXT = 'grpc.context';
   export const HOST = 'grpc.host';
   export const PORT = 'grpc.port';

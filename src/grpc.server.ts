@@ -3,6 +3,7 @@ import {Context, inject, Reflector} from '@loopback/context';
 import {GrpcBindings} from './keys';
 import {GrpcSequence} from './grpc.sequence';
 import * as grpc from 'grpc';
+import {GrpcGenerator} from './grpc.generator';
 const debug = require('debug')('loopback:grpc:server');
 /**
  * @class GrpcServer
@@ -13,22 +14,23 @@ const debug = require('debug')('loopback:grpc:server');
  */
 export class GrpcServer extends Context implements Server {
   /**
-       * @memberof GrpcServer
-       * Creates an instance of GrpcServer.
-       *
-       * @param {Application} app The application instance (injected via
-       * CoreBindings.APPLICATION_INSTANCE).
-       * @param {grpc.Server} server The actual GRPC Server module (injected via
-       * GrpcBindings.GRPC_SERVER).
-       * @param {GRPCServerConfig=} options The configuration options (injected via
-       * GRPCBindings.CONFIG).
-       *
-       */
+   * @memberof GrpcServer
+   * Creates an instance of GrpcServer.
+   *
+   * @param {Application} app The application instance (injected via
+   * CoreBindings.APPLICATION_INSTANCE).
+   * @param {grpc.Server} server The actual GRPC Server module (injected via
+   * GrpcBindings.GRPC_SERVER).
+   * @param {GRPCServerConfig=} options The configuration options (injected via
+   * GRPCBindings.CONFIG).
+   *
+   */
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) protected app: Application,
     @inject(GrpcBindings.GRPC_SERVER) protected server: grpc.Server,
     @inject(GrpcBindings.HOST) protected host: string,
     @inject(GrpcBindings.PORT) protected port: string,
+    @inject(GrpcBindings.GRPC_GENERATOR) protected generator: GrpcGenerator,
     @inject(GrpcBindings.PROTO_PROVIDER) protected protoProvider: any,
   ) {
     super(app);
@@ -42,6 +44,8 @@ export class GrpcServer extends Context implements Server {
       }
       this._setupControllerMethods(ctor.prototype);
     }
+    // Execute TypeScript Generator.
+    this.generator.execute();
   }
 
   async start(): Promise<void> {
@@ -97,8 +101,8 @@ export class GrpcServer extends Context implements Server {
    * @author Miroslav Bajtos
    * @author Jonathan Casarrubias
    * @license MIT
-   * @param prototype 
-   * @param methodName 
+   * @param prototype
+   * @param methodName
    */
   private setupGrpcCall(prototype, methodName: string): grpc.handleUnaryCall {
     const context: Context = this;

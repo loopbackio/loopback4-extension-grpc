@@ -1,6 +1,7 @@
-package greeterpackage;
 syntax = "proto3";
- 
+
+package greeterpackage;
+
 service Greeter {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}

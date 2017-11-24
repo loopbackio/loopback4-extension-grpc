@@ -5,6 +5,7 @@
 
 // Types and interfaces exposed by the extension go here
 export interface GrpcConfig {
+  cwd?: string;
   host?: string;
   port?: number;
   proto: string;

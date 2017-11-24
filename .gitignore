@@ -9,6 +9,9 @@ yarn-error.log*
 dist
 dist6
 
+# Generated test typescript files
+generated/*
+
 # Runtime data
 pids
 *.pid
