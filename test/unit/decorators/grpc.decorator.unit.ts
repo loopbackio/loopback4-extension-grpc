@@ -5,18 +5,15 @@
 import {expect} from '@loopback/testlab';
 import {grpc} from '../../..';
 import {GrpcBindings} from '../../../src/keys';
-import {
-  GreeterInterface,
-  HelloRequest,
-  HelloReply,
-} from '../../protos/greeter.proto';
+import {Config} from '../../../src/types';
+import {Greeter} from '../../acceptance/greeter.proto';
 import {Reflector} from '@loopback/context';
 
 describe('@rpc decorator', () => {
   it('defines reflection metadata for rpc method', () => {
-    class Greeter implements GreeterInterface {
-      @grpc()
-      sayHello(request: HelloRequest): HelloReply {
+    class GreeterCtrl implements Greeter.Service {
+      @grpc(Greeter.Config.SayHello)
+      sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
         return {message: `hello ${request.name}`};
       }
       Helper(): boolean {
@@ -24,17 +21,17 @@ describe('@rpc decorator', () => {
       }
     }
     const flags: {[key: string]: boolean} = {};
-    const proto = Greeter.prototype;
+    const proto = GreeterCtrl.prototype;
     const controllerMethods: string[] = Object.getOwnPropertyNames(
       proto,
     ).filter(key => key !== 'constructor' && typeof proto[key] === 'function');
     for (const methodName of controllerMethods) {
-      const enabled: boolean = Reflector.getMetadata(
+      const config: Config.Method = Reflector.getMetadata(
         GrpcBindings.LB_GRPC_HANDLER,
         proto,
         methodName,
       );
-      if (enabled) flags[methodName] = enabled;
+      if (config) flags[methodName] = true;
     }
     expect(flags).to.deepEqual({sayHello: true});
   });

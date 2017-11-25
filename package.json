@@ -29,14 +29,12 @@
     "type": "git",
     "url": "git+https://github.com/strongloop/loopback-next-extension-starter.git"
   },
-  "author": "",
-  "contributors": [
-    {
-      "name": "Jonathan Casarrubias",
-      "email": "jcasarrubias@mean.expert",
-      "url": "https://github.com/mean-expert-official"
-    }
-  ],
+  "author": {
+    "name": "Jonathan Casarrubias",
+    "email": "jcasarrubias@mean.expert",
+    "url": "https://github.com/mean-expert-official"
+  },
+  "contributors": [],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/strongloop/loopback-next-extension-starter/issues"
@@ -54,6 +52,7 @@
     "@loopback/core": "^4.0.0-alpha.16",
     "@loopback/repository": "^4.0.0-alpha.10",
     "@loopback/rest": "^4.0.0-alpha.3",
+    "@mean-expert/protoc-ts": "0.0.1",
     "grpc": "^1.6.6",
     "protobufjs": "^6.8.0"
   },

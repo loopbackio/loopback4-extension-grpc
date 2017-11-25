@@ -2,3 +2,4 @@ dist
 dist6
 api-docs
 *.json
+*.proto.ts

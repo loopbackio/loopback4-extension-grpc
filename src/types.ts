@@ -4,10 +4,19 @@
 // License text available at https://opensource.org/licenses/MIT
 
 // Types and interfaces exposed by the extension go here
-export interface GrpcConfig {
-  host?: string;
-  port?: number;
-  proto: string;
-  package: string;
-  sequence?: any;
+export namespace Config {
+  export interface Component {
+    cwd?: string;
+    host?: string;
+    port?: number;
+    sequence?: any;
+  }
+  export interface Method {
+    PROTO_NAME: string;
+    PROTO_PACKAGE: string;
+    SERVICE_NAME: string;
+    METHOD_NAME: string;
+    REQUEST_STREAM: boolean;
+    RESPONSE_STREAM: boolean;
+  }
 }
