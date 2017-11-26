@@ -2,47 +2,51 @@
 // Node module: loopback4-extension-starter
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
+
 import {expect} from '@loopback/testlab';
 import {inject} from '@loopback/context';
 import {Application} from '@loopback/core';
-import {GrpcSequenceInterface, GrpcConfig} from '../../';
+import {GrpcSequenceInterface, Config} from '../../';
+//import {GrpcConfig} from '../../';
 import {grpc} from '../../src/decorators/grpc.decorator';
 import * as grpcModule from 'grpc';
 import {GrpcComponent, GrpcBindings} from '../..';
-import {
-  GreeterInterface,
-  HelloRequest,
-  HelloReply,
-} from '../protos/greeter.proto';
-
-const pkg: string = 'greeterpackage';
-const file: string = './test/protos/greeter.proto';
-
+import {Greeter} from './greeter.proto';
+/** 
+Only run this on grpc typescript generation issues
+Comment all tests to do so.
+const app: Application = givenApplication();
+(async () => {
+  await app.start();
+  await app.stop();
+})();
+**/
 describe('GrpcComponent', () => {
   // GRPC Component Configurations
-  it('defines grpc component configurations', async () => {
+  /*it('defines grpc component configurations', async () => {
     const app: Application = givenApplication();
     const lbGrpcServer: any = await app.getServer('GrpcServer');
     expect(lbGrpcServer.getSync(GrpcBindings.PROTO_PKG)).to.be.eql(pkg);
     expect(lbGrpcServer.getSync(GrpcBindings.PROTO_FILE)).to.be.eql(file);
-  });
+  });*/
   // LoopBack GRPC Service
   it('creates a grpc service', async () => {
     // Define Greeter Service Implementation
-    class Greeter implements GreeterInterface {
+    class GreeterCtrl implements Greeter.Service {
       // Tell LoopBack that this is a Service RPC implementation
-      @grpc()
-      sayHello(request: HelloRequest): HelloReply {
-        const reply: HelloReply = {message: 'Hello ' + request.name};
-        return reply;
+      @grpc(Greeter.Config.SayHello)
+      sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
+        return {
+          message: 'Hello ' + request.name,
+        };
       }
     }
     // Load LoopBack Application
     const app: Application = givenApplication();
-    app.controller(Greeter);
+    app.controller(GreeterCtrl);
     await app.start();
     // Make GRPC Client Call
-    const result: HelloReply = await asyncCall({
+    const result: Greeter.HelloReply = await asyncCall({
       client: getGrpcClient(app),
       method: 'sayHello',
       data: {name: 'World'},
@@ -53,11 +57,11 @@ describe('GrpcComponent', () => {
   // LoopBack GRPC Service
   it('creates a grpc service with custom sequence', async () => {
     // Define Greeter Service Implementation
-    class Greeter implements GreeterInterface {
+    class GreeterCtrl implements Greeter.Service {
       // Tell LoopBack that this is a Service RPC implementation
-      @grpc()
-      sayHello(request: HelloRequest): HelloReply {
-        const reply: HelloReply = {message: 'Hello ' + request.name};
+      @grpc(Greeter.Config.SayHello)
+      sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
+        const reply: Greeter.HelloReply = {message: 'Hello ' + request.name};
         return reply;
       }
     }
@@ -66,7 +70,9 @@ describe('GrpcComponent', () => {
         @inject(GrpcBindings.CONTEXT) protected context,
         @inject(GrpcBindings.GRPC_METHOD) protected method,
       ) {}
-      async unaryCall(call: grpcModule.ServerUnaryCall): Promise<HelloReply> {
+      async unaryCall(
+        call: grpcModule.ServerUnaryCall,
+      ): Promise<Greeter.HelloReply> {
         // Do something before call
         const reply = await this.method(call.request);
         reply.message += ' Sequenced';
@@ -76,10 +82,10 @@ describe('GrpcComponent', () => {
     }
     // Load LoopBack Application
     const app: Application = givenApplication(MySequence);
-    app.controller(Greeter);
+    app.controller(GreeterCtrl);
     await app.start();
     // Make GRPC Client Call
-    const result: HelloReply = await asyncCall({
+    const result: Greeter.HelloReply = await asyncCall({
       client: getGrpcClient(app),
       method: 'sayHello',
       data: {name: 'World'},
@@ -90,13 +96,9 @@ describe('GrpcComponent', () => {
 });
 /**
  * Returns GRPC Enabled Application
- */
+ **/
 function givenApplication(sequence?): Application {
-  const grpcConfig: GrpcConfig = {
-    port: 0,
-    proto: file,
-    package: pkg,
-  };
+  const grpcConfig: Config.Component = {port: 0};
   if (sequence) {
     grpcConfig.sequence = sequence;
   }
@@ -107,10 +109,11 @@ function givenApplication(sequence?): Application {
 }
 /**
  * Returns GRPC Client
- */
+ **/
 function getGrpcClient(app: Application) {
-  const protoProvider = app.getSync(GrpcBindings.PROTO_PROVIDER);
-  const proto = protoProvider();
+  const proto: any = grpcModule.load('./test/acceptance/greeter.proto')[
+    'greeterpackage'
+  ];
   return new proto.Greeter(
     `${app.getSync(GrpcBindings.HOST)}:${app.getSync(GrpcBindings.PORT)}`,
     grpcModule.credentials.createInsecure(),
@@ -118,9 +121,9 @@ function getGrpcClient(app: Application) {
 }
 /**
  * Callback to Promise Wrapper
- */
-async function asyncCall(input): Promise<HelloReply> {
-  return new Promise<HelloReply>((resolve, reject) =>
+ **/
+async function asyncCall(input): Promise<Greeter.HelloReply> {
+  return new Promise<Greeter.HelloReply>((resolve, reject) =>
     input.client[input.method](input.data, (err, response) => {
       if (err) {
         reject(err);

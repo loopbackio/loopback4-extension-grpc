@@ -2,7 +2,9 @@ import {Application, CoreBindings, Server} from '@loopback/core';
 import {Context, inject, Reflector} from '@loopback/context';
 import {GrpcBindings} from './keys';
 import {GrpcSequence} from './grpc.sequence';
+import {Config} from './types';
 import * as grpc from 'grpc';
+import {GrpcGenerator} from './grpc.generator';
 const debug = require('debug')('loopback:grpc:server');
 /**
  * @class GrpcServer
@@ -13,25 +15,28 @@ const debug = require('debug')('loopback:grpc:server');
  */
 export class GrpcServer extends Context implements Server {
   /**
-       * @memberof GrpcServer
-       * Creates an instance of GrpcServer.
-       *
-       * @param {Application} app The application instance (injected via
-       * CoreBindings.APPLICATION_INSTANCE).
-       * @param {grpc.Server} server The actual GRPC Server module (injected via
-       * GrpcBindings.GRPC_SERVER).
-       * @param {GRPCServerConfig=} options The configuration options (injected via
-       * GRPCBindings.CONFIG).
-       *
-       */
+   * @memberof GrpcServer
+   * Creates an instance of GrpcServer.
+   *
+   * @param {Application} app The application instance (injected via
+   * CoreBindings.APPLICATION_INSTANCE).
+   * @param {grpc.Server} server The actual GRPC Server module (injected via
+   * GrpcBindings.GRPC_SERVER).
+   * @param {GRPCServerConfig=} options The configuration options (injected via
+   * GRPCBindings.CONFIG).
+   *
+   */
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) protected app: Application,
     @inject(GrpcBindings.GRPC_SERVER) protected server: grpc.Server,
     @inject(GrpcBindings.HOST) protected host: string,
     @inject(GrpcBindings.PORT) protected port: string,
-    @inject(GrpcBindings.PROTO_PROVIDER) protected protoProvider: any,
+    @inject(GrpcBindings.GRPC_GENERATOR) protected generator: GrpcGenerator,
   ) {
     super(app);
+    // Execute TypeScript Generator. (Must be first one to load)
+    this.generator.execute();
+    // Setup Controllers
     for (const b of this.find('controllers.*')) {
       const controllerName = b.key.replace(/^controllers\./, '');
       const ctor = b.valueConstructor;
@@ -63,42 +68,42 @@ export class GrpcServer extends Context implements Server {
   }
 
   private _setupControllerMethods(prototype: Function) {
-    const proto = this.protoProvider();
-    if (!proto) {
-      throw new Error(`Grpc Server: No proto file was provided.`);
-    }
-    const handlers: {[key: string]: grpc.handleUnaryCall} = {};
     const className = prototype.constructor.name || '<UnknownClass>';
-    // If this class is defined within the proto file
-    // then we search for rpc methods and register handlers.
-    if (proto[className] && proto[className].service) {
-      const controllerMethods = Object.getOwnPropertyNames(prototype).filter(
-        key => key !== 'constructor' && typeof prototype[key] === 'function',
+    const controllerMethods = Object.getOwnPropertyNames(prototype).filter(
+      key => key !== 'constructor' && typeof prototype[key] === 'function',
+    );
+
+    let config: Config.Method;
+    for (const methodName of controllerMethods) {
+      const fullName = `${className}.${methodName}`;
+      const _config: Config.Method = Reflector.getMetadata(
+        GrpcBindings.LB_GRPC_HANDLER,
+        prototype,
+        methodName,
       );
-      for (const methodName of controllerMethods) {
-        const fullName = `${className}.${methodName}`;
-        const enabled: boolean = Reflector.getMetadata(
-          GrpcBindings.LB_GRPC_HANDLER,
-          prototype,
-          methodName,
-        );
-        if (!enabled) {
-          return debug(`  skipping ${fullName} - grpc is not enabled`);
-        }
-        handlers[methodName] = this.setupGrpcCall(prototype, methodName);
+      if (!_config) {
+        return debug(`  skipping ${fullName} - grpc is not enabled`);
       }
-      // Regster GRPC Service
-      this.server.addService(proto[className].service, handlers);
+      config = _config;
+      const proto: grpc.GrpcObject = this.generator.getProto(config.PROTO_NAME);
+      if (!proto) {
+        throw new Error(`Grpc Server: No proto file was provided.`);
+      }
+      this.server.addService(
+        proto[config.PROTO_PACKAGE][config.SERVICE_NAME].service,
+        {
+          [config.METHOD_NAME]: this.setupGrpcCall(prototype, methodName),
+        },
+      );
     }
   }
-
   /**
    * @method setupGrpcCall
    * @author Miroslav Bajtos
    * @author Jonathan Casarrubias
    * @license MIT
-   * @param prototype 
-   * @param methodName 
+   * @param prototype
+   * @param methodName
    */
   private setupGrpcCall(prototype, methodName: string): grpc.handleUnaryCall {
     const context: Context = this;

@@ -15,41 +15,64 @@ $ npm install --save @loopback/grpc
 ## Component Configuration
 ```js
 import {Application} from '@loopback/core';
-import {GrpcComponent, GrpcConfig} from '@loopback/grpc';
-import {MyGreeter} from './MyGreeter';
-
-const config: GrpcConfig = {
-    proto: './file.proto',
-    package: 'myawesomepackage'
-}
-
+import {GrpcComponent, Config} from '@loopback/grpc';
+import {GreeterCtrl} from './controllers/greeter/greeter.ctrl';
+// Grpc Configurations are optional.
+const config: Config.Component = { /* Optional Configs */ }
+// Add Grpc as Component and pass the optional configurations
 const app = new Application({
     components: [GrpcComponent],
     grpc: config
 });
-
-app.controller(MyGreeter});
-
-await app.start();
+// Bind GreeterCtrl to the LoopBack Application
+app.controller(GreeterCtrl);
+// Start App
+app.start();
 ```
+## Grpc auto-generated code
+The `@loopback/grpc` extension provides you with auto-generated interfaces and configurations for strict development.
 
-## Grpc Decorator
-The `@loopback/grpc` component provides you with a handy decorator to implement GRPC Methods.
+The extension will automatically look for proto files within your project structure, creating the corresponding typescript interfaces.
 
+Example:
+
+````sh
+- app
+| - controllers
+| | - greeter
+| | | - greeter.proto
+| | | - greeter.ctrl.ts
+````
+
+Once you start your app for first time it will automatically create your typescript interfaces from the `greeter.proto` file.
+
+````sh
+- app
+| - controllers
+| | - greeter
+| | | - greeter.proto
+| | | - greeter.proto.ts <--- Auto-generated
+| | | - greeter.ctrl.ts
+````
+
+Once your interfaces and configurations are created, you can start building your controller logic.
+
+## Grpc Controller
+The `@loopback/grpc` component provides you with a handy decorator to implement GRPC Methods within your LoopBack controllers.
+
+`app/controllers/greeter/greeter.ctrl.ts`
 ```js
 import {grpc} from '@loopback/grpc';
-// You create the following types according your own proto.file
-import {Greeter, HelloRequest, HelloReply} from './types';
+import {Greeter} from '/greeter.proto';
 /**
- * @class MyGreeter
+ * @class GreeterCtrl
  * @description Implements grpc proto service
  **/
-export class MyGreeter implements Greeter {
+export class GreeterCtrl implements Greeter.Service {
     // Tell LoopBack that this is a Service RPC implementation
-    @grpc()
-    SayHello(request: HelloRequest): HelloReply {
-        const reply: HelloReply = {message: 'Hello ' + request.name};
-        return reply;
+    @grpc(Greeter.Config.SayHello)
+    sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
+        return {message: 'Hello ' + request.name};
     }
 }
 ```
