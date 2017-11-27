@@ -77,6 +77,28 @@ export class GreeterCtrl implements Greeter.Service {
 }
 ```
 
+## Proto Example
+`app/controllers/greeter/greeter.proto`
+````txt
+syntax = "proto3";
+package greeterpackage;
+
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+````
+
 ## Contribute
 Get started by either downloading this project or cloning it as follows:
 
@@ -91,6 +113,11 @@ $ cd loopback4-extension-grpc && npm install
 
 ## Tests
 run `npm test` from the root folder.
+
+## Todo
+
+- Watch for proto changes.
+- Server/Client Streams
 
 ## Contributors
 See [all contributors](https://github.com/strongloop/loopback4-extension-grpc/graphs/contributors).
