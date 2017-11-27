@@ -1,12 +1,9 @@
-# Decorators
 
 ## Overview
 
 Decorators provide annotations for class methods and arguments. Decorators use the form `@decorator` where `decorator` is the name of the function that will be called at runtime.
 
-## Basic Usage
-
-### gRPC
+### gRPC Decorator
 
 This decorator allows you to annotate a `Controller` class. The decorator will setup a GRPC Service.
 
@@ -15,10 +12,17 @@ This decorator allows you to annotate a `Controller` class. The decorator will s
 /**
 * Setup gRPC MicroService
 **/
-class Greeter implements GreeterInterface {
-  @grpc()
-  SayHello(request: HelloRequest): HelloReply {
-    return {message: `hello ${request.name}`};
+//myproject/controllers/greeter/Greeter.ts
+//myproject/controllers/greeter/greeter.proto
+//myproject/controllers/greeter/greeter.proto.ts
+//Note: greeter.proto.ts is automatically generated from
+//greeter.proto
+import {grpc} from '@loopback/grpc';
+import {Greeter} from 'greeter.proto';
+class GreeterCtrl implements Greeter.Service {
+  @grpc(Greeter.Config.SayHello)
+  public sayHello(request: Greeter.HelloRequest): Greeter.HelloResponse {
+    return { message: 'Hello ' + call.request.name };
   }
 }
 ````
@@ -26,8 +30,8 @@ class Greeter implements GreeterInterface {
 ## Example Proto File
 
 ````proto
-package awesomepackage;
 syntax = "proto3";
+package awesomepackage;
  
 service Greeter {
   // Sends a greeting

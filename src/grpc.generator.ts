@@ -48,16 +48,11 @@ export class GrpcGenerator {
    * typescript files generations from found proto files.
    */
   public execute(): void {
-    this.getProtoPaths()
-      .filter((file: string) => {
-        // TODO: Implement directory exeptions (jonathan-casarrubias)
-        return file.match(/.proto$/) && !file.match(/node_modules/);
-      })
-      .forEach((protoPath: string) => {
-        const protoName: string = protoPath.split('/').pop() || '';
-        this.protos[protoName] = this.loadProto(protoPath);
-        this.generate(protoPath);
-      });
+    this.getProtoPaths().forEach((protoPath: string) => {
+      const protoName: string = protoPath.split('/').pop() || '';
+      this.protos[protoName] = this.loadProto(protoPath);
+      this.generate(protoPath);
+    });
   }
   /**
    * @method getProto

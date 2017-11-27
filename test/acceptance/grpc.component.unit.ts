@@ -2,7 +2,6 @@
 // Node module: loopback4-extension-starter
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
-
 import {expect} from '@loopback/testlab';
 import {inject} from '@loopback/context';
 import {Application} from '@loopback/core';
@@ -23,12 +22,11 @@ const app: Application = givenApplication();
 **/
 describe('GrpcComponent', () => {
   // GRPC Component Configurations
-  /*it('defines grpc component configurations', async () => {
+  it('defines grpc component configurations', async () => {
     const app: Application = givenApplication();
     const lbGrpcServer: any = await app.getServer('GrpcServer');
-    expect(lbGrpcServer.getSync(GrpcBindings.PROTO_PKG)).to.be.eql(pkg);
-    expect(lbGrpcServer.getSync(GrpcBindings.PROTO_FILE)).to.be.eql(file);
-  });*/
+    expect(lbGrpcServer.getSync(GrpcBindings.PORT)).to.be.eql(8080);
+  });
   // LoopBack GRPC Service
   it('creates a grpc service', async () => {
     // Define Greeter Service Implementation
@@ -98,7 +96,7 @@ describe('GrpcComponent', () => {
  * Returns GRPC Enabled Application
  **/
 function givenApplication(sequence?): Application {
-  const grpcConfig: Config.Component = {port: 0};
+  const grpcConfig: Config.Component = {port: 8080};
   if (sequence) {
     grpcConfig.sequence = sequence;
   }

@@ -42,10 +42,13 @@ export class GrpcComponent implements Component {
     @inject(GrpcBindings.CONFIG) config: Config.Component,
   ) {
     // Set default configuration for this component
-    config = Object.assign({}, config, {
-      host: '127.0.0.1',
-      port: 3000,
-    });
+    config = Object.assign(
+      {
+        host: '127.0.0.1',
+        port: 3000,
+      },
+      config,
+    );
     // Bind host, port, proto path, package and sequence
     app.bind(GrpcBindings.HOST).to(config.host);
     app.bind(GrpcBindings.PORT).to(config.port);
