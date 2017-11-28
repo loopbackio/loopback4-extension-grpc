@@ -10,7 +10,7 @@ import {GrpcSequenceInterface, Config} from '../../';
 import {grpc} from '../../src/decorators/grpc.decorator';
 import * as grpcModule from 'grpc';
 import {GrpcComponent, GrpcBindings} from '../..';
-import {Greeter} from './greeter.proto';
+import {Greeter, HelloRequest, HelloReply} from './greeter.proto';
 /** 
 Only run this on grpc typescript generation issues
 Comment all tests to do so.
@@ -32,8 +32,8 @@ describe('GrpcComponent', () => {
     // Define Greeter Service Implementation
     class GreeterCtrl implements Greeter.Service {
       // Tell LoopBack that this is a Service RPC implementation
-      @grpc(Greeter.Config.SayHello)
-      sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
+      @grpc(Greeter.SayHello)
+      sayHello(request: HelloRequest): HelloReply {
         return {
           message: 'Hello ' + request.name,
         };
@@ -44,7 +44,7 @@ describe('GrpcComponent', () => {
     app.controller(GreeterCtrl);
     await app.start();
     // Make GRPC Client Call
-    const result: Greeter.HelloReply = await asyncCall({
+    const result: HelloReply = await asyncCall({
       client: getGrpcClient(app),
       method: 'sayHello',
       data: {name: 'World'},
@@ -57,9 +57,9 @@ describe('GrpcComponent', () => {
     // Define Greeter Service Implementation
     class GreeterCtrl implements Greeter.Service {
       // Tell LoopBack that this is a Service RPC implementation
-      @grpc(Greeter.Config.SayHello)
-      sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
-        const reply: Greeter.HelloReply = {message: 'Hello ' + request.name};
+      @grpc(Greeter.SayHello)
+      sayHello(request: HelloRequest): HelloReply {
+        const reply: HelloReply = {message: 'Hello ' + request.name};
         return reply;
       }
     }
@@ -68,9 +68,7 @@ describe('GrpcComponent', () => {
         @inject(GrpcBindings.CONTEXT) protected context,
         @inject(GrpcBindings.GRPC_METHOD) protected method,
       ) {}
-      async unaryCall(
-        call: grpcModule.ServerUnaryCall,
-      ): Promise<Greeter.HelloReply> {
+      async unaryCall(call: grpcModule.ServerUnaryCall): Promise<HelloReply> {
         // Do something before call
         const reply = await this.method(call.request);
         reply.message += ' Sequenced';
@@ -83,7 +81,7 @@ describe('GrpcComponent', () => {
     app.controller(GreeterCtrl);
     await app.start();
     // Make GRPC Client Call
-    const result: Greeter.HelloReply = await asyncCall({
+    const result: HelloReply = await asyncCall({
       client: getGrpcClient(app),
       method: 'sayHello',
       data: {name: 'World'},
@@ -120,8 +118,8 @@ function getGrpcClient(app: Application) {
 /**
  * Callback to Promise Wrapper
  **/
-async function asyncCall(input): Promise<Greeter.HelloReply> {
-  return new Promise<Greeter.HelloReply>((resolve, reject) =>
+async function asyncCall(input): Promise<HelloReply> {
+  return new Promise<HelloReply>((resolve, reject) =>
     input.client[input.method](input.data, (err, response) => {
       if (err) {
         reject(err);
