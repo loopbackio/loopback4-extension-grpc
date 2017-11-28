@@ -22,11 +22,11 @@ import {Config} from '../types';
  * Note: greeter.proto.ts is automatically generated from
  * greeter.proto
  *
- * import { Greeter } from 'greeter.proto';
+ * import {Greeter, HelloRequest, HelloReply} from 'greeter.proto';
  *
  * class GreeterCtrl implements Greeter.Service {
- *   @grpc(Greeter.Config.SayHello)
- *   public sayHello(request: Greeter.HelloRequest): Greeter.HelloResponse {
+ *   @grpc(Greeter.SayHello)
+ *   public sayHello(request: HelloRequest): HelloResponse {
  *     return { message: 'Hello ' + call.request.name };
  *   }
  * }

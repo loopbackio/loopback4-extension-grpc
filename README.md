@@ -63,15 +63,15 @@ The `@loopback/grpc` component provides you with a handy decorator to implement 
 `app/controllers/greeter/greeter.ctrl.ts`
 ```js
 import {grpc} from '@loopback/grpc';
-import {Greeter} from '/greeter.proto';
+import {Greeter, HelloRequest, HelloReply} from '/greeter.proto';
 /**
  * @class GreeterCtrl
  * @description Implements grpc proto service
  **/
 export class GreeterCtrl implements Greeter.Service {
     // Tell LoopBack that this is a Service RPC implementation
-    @grpc(Greeter.Config.SayHello)
-    sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
+    @grpc(Greeter.SayHello)
+    sayHello(request: HelloRequest): HelloReply {
         return {message: 'Hello ' + request.name};
     }
 }

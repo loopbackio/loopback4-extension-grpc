@@ -6,14 +6,18 @@ import {expect} from '@loopback/testlab';
 import {grpc} from '../../..';
 import {GrpcBindings} from '../../../src/keys';
 import {Config} from '../../../src/types';
-import {Greeter} from '../../acceptance/greeter.proto';
+import {
+  Greeter,
+  HelloRequest,
+  HelloReply,
+} from '../../acceptance/greeter.proto';
 import {Reflector} from '@loopback/context';
 
 describe('@rpc decorator', () => {
   it('defines reflection metadata for rpc method', () => {
     class GreeterCtrl implements Greeter.Service {
-      @grpc(Greeter.Config.SayHello)
-      sayHello(request: Greeter.HelloRequest): Greeter.HelloReply {
+      @grpc(Greeter.SayHello)
+      sayHello(request: HelloRequest): HelloReply {
         return {message: `hello ${request.name}`};
       }
       Helper(): boolean {

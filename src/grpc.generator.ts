@@ -9,10 +9,17 @@ import * as fs from 'fs';
  * @license MIT
  * @description GRPC TypeScript generator.
  * This class will iterate over a directory generating
- * typescript files from proto files.
- * Required for @grpc configuration and declaration of types.
+ * corresponding typescript files from proto files.
+ * Required for @grpc configuration and strict development.
  */
 export class GrpcGenerator {
+  /**
+   * @property {[name: string]: grpc.GrpcObject} protos
+   * @author Jonathan Casarrubias <t: johncasarrubias>
+   * @description proto instances directory loaded during
+   * boot time and later being used by implemented grpc
+   * controllers.
+   */
   private protos: {[name: string]: grpc.GrpcObject} = {};
   /**
    * @method constructor
@@ -23,29 +30,12 @@ export class GrpcGenerator {
    */
   constructor(protected config: Config.Component) {}
   /**
-   * @method walk
-   * @param dir
-   * @author Jonathan Casarrubias <t: johncasarrubias>
-   * @license MIT
-   * @description This method will walk through a directory
-   */
-  private walk(dir: string): string[] {
-    let results: string[] = [];
-    const list = fs.readdirSync(dir);
-    list.forEach((file: string) => {
-      file = dir + '/' + file;
-      const stat = fs.statSync(file);
-      if (stat && stat.isDirectory()) results = results.concat(this.walk(file));
-      else results.push(file);
-    });
-    return results;
-  }
-  /**
    * @method execute
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
-   * @description This method will execute a directory look ahead and
-   * typescript files generations from found proto files.
+   * @description This method will find and load all protos
+   * contained within the project directory. Saving in memory
+   * instances for those found protos for later usage.
    */
   public execute(): void {
     this.getProtoPaths().forEach((protoPath: string) => {
@@ -56,20 +46,25 @@ export class GrpcGenerator {
   }
   /**
    * @method getProto
+   * @param {string} name
+   * @returns {grpc.GrpcObject}
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
-   * @description This method will getProto declaration used to load
-   * this service to the grpc server.
+   * @description This method will return a proto instance
+   * from the proto list directory, previously loaded during
+   * boot time.
    */
   public getProto(name: string): grpc.GrpcObject {
     return this.protos[name];
   }
   /**
    * @method loadProto
+   * @param {string} protoPath
+   * @returns {grpc.GrpcObject}
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
-   * @description This method will loadProto declaration used to load
-   * this service to the grpc server.
+   * @description This method receive a proto file path and
+   * load that proto using the official grpc library.
    */
   public loadProto(protoPath: string): grpc.GrpcObject {
     const proto: grpc.GrpcObject = grpc.load(protoPath);
@@ -77,6 +72,7 @@ export class GrpcGenerator {
   }
   /**
    * @method getProtoPaths
+   * @returns {string[]}
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
    * @description This method will getProtoPaths a directory look ahead and
@@ -91,12 +87,35 @@ export class GrpcGenerator {
     );
   }
   /**
+   * @method walk
+   * @param {string} dir
+   * @returns {string[]}
+   * @author Jonathan Casarrubias <t: johncasarrubias>
+   * @license MIT
+   * @description This method will walk through a directory and return a list
+   * of containing files.
+   */
+  private walk(dir: string): string[] {
+    let results: string[] = [];
+    const list = fs.readdirSync(dir);
+    list.forEach((file: string) => {
+      file = dir + '/' + file;
+      const stat = fs.statSync(file);
+      if (stat && stat.isDirectory()) results = results.concat(this.walk(file));
+      else results.push(file);
+    });
+    return results;
+  }
+  /**
    * @method generate
-   * @param proto
+   * @param {string} proto
+   * @returns {Buffer}
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
    * @description This method will generate a typescript
-   * declaration and servide files from a given .proto file path
+   * file representing the provided proto file by calling
+   * google's proto compiler and using @mean-experts's
+   * protoc-ts plugin.
    */
   private generate(proto: string): Buffer {
     const root = path.dirname(proto);
