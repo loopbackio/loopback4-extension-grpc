@@ -7,8 +7,8 @@ yarn-error.log*
 *.DS_Store
 
 # Distribution Directories
-dist
-dist6
+# dist DISABLED ONLY FOR "latest" branch
+# dist6 DISABLED ONLY FOR "latest" branch
 
 # Runtime data
 pids

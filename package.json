@@ -45,7 +45,8 @@
     "index.js",
     "index.d.ts",
     "dist",
-    "dist6"
+    "dist6",
+    "compilers"
   ],
   "dependencies": {
     "@loopback/context": "^4.0.0-alpha.14",
