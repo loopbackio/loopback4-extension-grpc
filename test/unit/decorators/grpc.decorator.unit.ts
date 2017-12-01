@@ -15,7 +15,7 @@ import {Reflector} from '@loopback/context';
 
 describe('@rpc decorator', () => {
   it('defines reflection metadata for rpc method', () => {
-    class GreeterCtrl implements Greeter.Service {
+    class GreeterCtrl implements Greeter.Interface {
       @grpc(Greeter.SayHello)
       sayHello(request: HelloRequest): HelloReply {
         return {message: `hello ${request.name}`};

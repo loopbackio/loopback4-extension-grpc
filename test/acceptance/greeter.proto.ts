@@ -1,20 +1,29 @@
+import * as grpc from "grpc";
 export namespace Greeter {
   /**
-   * @interface Greeter.Service
+   * @interface Greeter.Error
+   * @author Jonathan Casarrubias <t: johncasarrubias>
+   * @license MIT
+   * @description Greeter interface that provides types
+    * for results with errors. This is extending from grpc ServerError.
+   */
+  export interface Error extends grpc.ServiceError {}
+  /**
+   * @interface Greeter.Interface
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
    * @description Greeter interface that provides types
    * for methods from the given gRPC Greeter Service.
    */
-  export interface Service {
+  export interface Interface {
     /**
-     * @method Greeter.Service.sayHello
+     * @method Greeter.Interface.sayHello
      * @author Jonathan Casarrubias <t: johncasarrubias>
      * @license MIT
      * @description Greeter method declaration
      * from the given gRPC Greeter service.
      */
-    sayHello(request: HelloRequest): HelloReply;
+    sayHello(request: HelloRequest): HelloReply | Greeter.Error;
   }
   /**
    * @namespace Greeter.SayHello

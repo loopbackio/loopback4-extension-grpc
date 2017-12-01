@@ -9,6 +9,9 @@ import * as grpc from 'grpc';
  */
 export interface GrpcSequenceInterface {
   unaryCall(request: grpc.ServerUnaryCall): Promise<any>;
+  duplexStream(request: grpc.ServerDuplexStream): void;
+  readableStream(request: grpc.ServerReadableStream): void;
+  writeableStream(request: grpc.ServerWriteableStream): void;
 }
 /**
  * @class GrpcSequence
@@ -27,5 +30,20 @@ export class GrpcSequence implements GrpcSequenceInterface {
     const reply = await this.method(call.request);
     // Do something after call
     return reply;
+  }
+
+  duplexStream(stream: grpc.ServerDuplexStream): void {
+    // Do something with stream
+    this.method(stream);
+  }
+
+  readableStream(stream: grpc.ServerReadableStream): void {
+    // Do something with stream
+    this.method(stream);
+  }
+
+  writeableStream(stream: grpc.ServerWriteableStream): void {
+    // Do something with stream
+    this.method(stream);
   }
 }
