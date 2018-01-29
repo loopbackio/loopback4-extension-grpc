@@ -2,7 +2,7 @@ import {Config} from './types';
 import {execSync} from 'child_process';
 import * as grpc from 'grpc';
 import * as path from 'path';
-import * as fs from 'fs';
+import * as glob from 'glob';
 /**
  * @class GrpcGenerator
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -79,33 +79,16 @@ export class GrpcGenerator {
    * typescript files generations from found proto files.
    */
   public getProtoPaths(): string[] {
-    return this.walk(this.config.cwd || process.cwd()).filter(
-      (file: string) => {
-        // TODO: Implement directory exeptions (jonathan-casarrubias)
-        return file.match(/.proto$/) && !file.match(/node_modules/);
-      },
-    );
+    const pattern = this.config.protoPattern || '**/*.proto';
+    const ignores = this.config.protoIngores || ['**/node_modules/**'];
+    const options = {
+      cwd: this.config.cwd || process.cwd(),
+      ignore: ignores,
+      nodir: true,
+    };
+    return glob.sync(pattern, options);
   }
-  /**
-   * @method walk
-   * @param {string} dir
-   * @returns {string[]}
-   * @author Jonathan Casarrubias <t: johncasarrubias>
-   * @license MIT
-   * @description This method will walk through a directory and return a list
-   * of containing files.
-   */
-  private walk(dir: string): string[] {
-    let results: string[] = [];
-    const list = fs.readdirSync(dir);
-    list.forEach((file: string) => {
-      file = dir + '/' + file;
-      const stat = fs.statSync(file);
-      if (stat && stat.isDirectory()) results = results.concat(this.walk(file));
-      else results.push(file);
-    });
-    return results;
-  }
+
   /**
    * @method generate
    * @param {string} proto
