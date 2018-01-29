@@ -1,10 +1,19 @@
-import {Application, CoreBindings, Server} from '@loopback/core';
-import {Context, inject, Reflector} from '@loopback/context';
+import {
+  Application,
+  CoreBindings,
+  Server,
+  ControllerClass,
+} from '@loopback/core';
+import {MetadataInspector} from '@loopback/metadata';
+import {Context, inject, Constructor} from '@loopback/context';
+import {GRPC_METHODS} from './decorators/grpc.decorator';
 import {GrpcBindings} from './keys';
 import {GrpcSequence} from './grpc.sequence';
 import {Config} from './types';
 import * as grpc from 'grpc';
+import {Service} from 'protobufjs';
 import {GrpcGenerator} from './grpc.generator';
+import {BindingScope} from '@loopback/context/dist/src/binding';
 const debug = require('debug')('loopback:grpc:server');
 /**
  * @class GrpcServer
@@ -45,7 +54,7 @@ export class GrpcServer extends Context implements Server {
           `The controller ${controllerName} was not bound via .toClass()`,
         );
       }
-      this._setupControllerMethods(ctor.prototype);
+      this._setupControllerMethods(ctor);
     }
   }
 
@@ -67,34 +76,30 @@ export class GrpcServer extends Context implements Server {
     });
   }
 
-  private _setupControllerMethods(prototype: Function) {
-    const className = prototype.constructor.name || '<UnknownClass>';
-    const controllerMethods = Object.getOwnPropertyNames(prototype).filter(
-      key => key !== 'constructor' && typeof prototype[key] === 'function',
-    );
+  private _setupControllerMethods(ctor: ControllerClass) {
+    const className = ctor.name || '<UnknownClass>';
+    const controllerMethods =
+      MetadataInspector.getAllMethodMetadata<Config.Method>(
+        GRPC_METHODS,
+        ctor.prototype,
+      ) || {};
 
-    let config: Config.Method;
-    for (const methodName of controllerMethods) {
+    for (const methodName in controllerMethods) {
       const fullName = `${className}.${methodName}`;
-      const _config: Config.Method = Reflector.getMetadata(
-        GrpcBindings.LB_GRPC_HANDLER,
-        prototype,
-        methodName,
-      );
-      if (!_config) {
-        return debug(`  skipping ${fullName} - grpc is not enabled`);
-      }
-      config = _config;
+      const config = controllerMethods[methodName];
+
       const proto: grpc.GrpcObject = this.generator.getProto(config.PROTO_NAME);
       if (!proto) {
         throw new Error(`Grpc Server: No proto file was provided.`);
       }
-      this.server.addService(
-        proto[config.PROTO_PACKAGE][config.SERVICE_NAME].service,
-        {
-          [config.METHOD_NAME]: this.setupGrpcCall(prototype, methodName),
-        },
-      );
+
+      const pkgMeta = proto[config.PROTO_PACKAGE] as grpc.GrpcObject;
+      // tslint:disable-next-line:no-any
+      const serviceMeta = pkgMeta[config.SERVICE_NAME] as any;
+      const serviceDef: Service = serviceMeta.service;
+      this.server.addService(serviceDef, {
+        [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName),
+      });
     }
   }
   /**
@@ -105,11 +110,15 @@ export class GrpcServer extends Context implements Server {
    * @param prototype
    * @param methodName
    */
-  private setupGrpcCall(prototype, methodName: string): grpc.handleUnaryCall {
+  private setupGrpcCall<T>(
+    ctor: ControllerClass,
+    methodName: string,
+  ): grpc.handleUnaryCall {
     const context: Context = this;
     return function(
       call: grpc.ServerUnaryCall,
-      callback: (err, value?) => void,
+      // tslint:disable-next-line:no-any
+      callback: (err: any, value?: T) => void,
     ) {
       handleUnary().then(
         result => callback(null, result),
@@ -118,9 +127,13 @@ export class GrpcServer extends Context implements Server {
           callback(error);
         },
       );
-      async function handleUnary(): Promise<any> {
+      async function handleUnary(): Promise<T> {
         context.bind(GrpcBindings.CONTEXT).to(context);
-        context.bind(GrpcBindings.GRPC_METHOD).to(prototype[methodName]);
+        context
+          .bind(GrpcBindings.GRPC_CONTROLLER)
+          .toClass(ctor)
+          .inScope(BindingScope.CONTEXT);
+        context.bind(GrpcBindings.GRPC_METHOD_NAME).to(methodName);
         const sequence: GrpcSequence = await context.get(
           GrpcBindings.GRPC_SEQUENCE,
         );

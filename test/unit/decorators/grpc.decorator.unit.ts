@@ -3,9 +3,9 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 import {expect} from '@loopback/testlab';
-import {grpc} from '../../..';
-import {GrpcBindings} from '../../../src/keys';
-import {Config} from '../../../src/types';
+import {MetadataInspector} from '@loopback/metadata';
+import {grpc, GrpcBindings, Config, GRPC_METHODS} from '../../..';
+
 import {
   Greeter,
   HelloRequest,
@@ -24,19 +24,12 @@ describe('@rpc decorator', () => {
         return true;
       }
     }
-    const flags: {[key: string]: boolean} = {};
+
     const proto = GreeterCtrl.prototype;
-    const controllerMethods: string[] = Object.getOwnPropertyNames(
-      proto,
-    ).filter(key => key !== 'constructor' && typeof proto[key] === 'function');
-    for (const methodName of controllerMethods) {
-      const config: Config.Method = Reflector.getMetadata(
-        GrpcBindings.LB_GRPC_HANDLER,
-        proto,
-        methodName,
-      );
-      if (config) flags[methodName] = true;
-    }
-    expect(flags).to.deepEqual({sayHello: true});
+    const controllerMethods = MetadataInspector.getAllMethodMetadata(
+      GRPC_METHODS,
+      GreeterCtrl.prototype,
+    );
+    expect(controllerMethods).to.have.property('sayHello');
   });
 });
