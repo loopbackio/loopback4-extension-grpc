@@ -1,0 +1,16 @@
+{
+  "content": [
+    "src/grpc.sequence.ts",
+    "src/keys.ts",
+    "src/grpc.component.ts",
+    "src/grpc.server.ts",
+    "src/grpc.generator.ts",
+    "src/index.ts",
+    "src/types.ts",
+    "src/decorators/grpc.decorator.ts",
+    "src/providers/generator.provider.ts",
+    "src/providers/server.provider.ts",
+    "index.ts"
+  ],
+  "codeSectionDepth": 4
+}

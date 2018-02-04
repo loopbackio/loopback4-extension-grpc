@@ -1,4 +1,4 @@
-import {inject} from '@loopback/context';
+import {inject, Context} from '@loopback/context';
 import {GrpcBindings} from './keys';
 import * as grpc from 'grpc';
 /**
@@ -8,6 +8,7 @@ import * as grpc from 'grpc';
  * @description Interface that describes a GRPC Sequence
  */
 export interface GrpcSequenceInterface {
+  // tslint:disable-next-line:no-any
   unaryCall(request: grpc.ServerUnaryCall): Promise<any>;
 }
 /**
@@ -18,13 +19,15 @@ export interface GrpcSequenceInterface {
  */
 export class GrpcSequence implements GrpcSequenceInterface {
   constructor(
-    @inject(GrpcBindings.CONTEXT) protected context,
-    @inject(GrpcBindings.GRPC_METHOD) protected method,
+    @inject(GrpcBindings.GRPC_CONTROLLER)
+    protected controller: {[method: string]: Function},
+    @inject(GrpcBindings.GRPC_METHOD_NAME) protected method: string,
   ) {}
 
+  // tslint:disable-next-line:no-any
   async unaryCall(call: grpc.ServerUnaryCall): Promise<any> {
     // Do something before call
-    const reply = await this.method(call.request);
+    const reply = await this.controller[this.method](call.request);
     // Do something after call
     return reply;
   }

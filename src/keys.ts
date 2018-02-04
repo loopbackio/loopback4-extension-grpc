@@ -17,5 +17,4 @@ export namespace GrpcBindings {
   export const HOST = 'grpc.host';
   export const PORT = 'grpc.port';
   export const CONFIG = `${CoreBindings.APPLICATION_CONFIG}#grpc`;
-  export const LB_GRPC_HANDLER = 'loopback:grpc-service:handler';
 }

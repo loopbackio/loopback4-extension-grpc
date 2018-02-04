@@ -1,3 +1,6 @@
+import {Constructor} from '@loopback/context';
+import {GrpcSequenceInterface} from './grpc.sequence';
+
 // Copyright IBM Corp. 2017. All Rights Reserved.
 // Node module: loopback4-extension-starter
 // This file is licensed under the MIT License.
@@ -7,9 +10,18 @@
 export namespace Config {
   export interface Component {
     cwd?: string;
+    /**
+     * glob pattern for proto files, default to `**\/*proto`
+     */
+    protoPattern?: string;
+    /**
+     * An array of glob patterns to ignore for proto files,
+     * default to ['**\/node_modules\/**]
+     */
+    protoIngores?: string[];
     host?: string;
     port?: number;
-    sequence?: any;
+    sequence?: Constructor<GrpcSequenceInterface>;
   }
   export interface Method {
     PROTO_NAME: string;

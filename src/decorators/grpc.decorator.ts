@@ -2,9 +2,12 @@
 // Node module: loopback4-extension-starter
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
-import {Reflector} from '@loopback/context';
-import {GrpcBindings} from '../keys';
+
+import {MethodDecoratorFactory} from '@loopback/metadata';
 import {Config} from '../types';
+
+export const GRPC_METHODS = 'grpc:methods';
+
 /**
  * @function gRPCService
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -32,12 +35,5 @@ import {Config} from '../types';
  * }
  */
 export function grpc(config: Config.Method) {
-  return function(target: object, propertyKey: string) {
-    Reflector.defineMetadata(
-      GrpcBindings.LB_GRPC_HANDLER,
-      config,
-      target,
-      propertyKey,
-    );
-  };
+  return MethodDecoratorFactory.createDecorator(GRPC_METHODS, config);
 }
