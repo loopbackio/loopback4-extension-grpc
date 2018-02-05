@@ -1,8 +1,11 @@
 sudo: false
 language: node_js
 node_js:
-  - "6"
   - "8"
+
+os:
+  - linux
+  - osx
 
 git:
   depth: 300
