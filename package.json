@@ -43,7 +43,8 @@
     "README.md",
     "index.js",
     "index.d.ts",
-    "dist"
+    "dist",
+    "compilers"
   ],
   "dependencies": {
     "@loopback/context": "^4.0.0-alpha.30",
