@@ -4,7 +4,7 @@
 
 ## Overview
 
-The `@loopback/grpc` component enables LoopBack 4 as a [gRPC] Server. Also it provides with a [gRPC] decorator to define your RPC Method implementations from your Application Controllers.
+The `@loopback/grpc` component enables LoopBack 4 as a [gRPC](https://grpc.io/) Server. Also it provides with a gRPC decorator to define your RPC Method implementations from your Application Controllers.
 
 ## Installation
 
