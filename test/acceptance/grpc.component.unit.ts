@@ -104,10 +104,11 @@ function givenApplication(
   if (sequence) {
     grpcConfig.sequence = sequence;
   }
-  return new Application({
-    components: [GrpcComponent],
+  const app = new Application({
     grpc: grpcConfig,
   });
+  app.component(GrpcComponent);
+  return app;
 }
 /**
  * Returns GRPC Client
