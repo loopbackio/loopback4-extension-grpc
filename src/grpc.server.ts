@@ -96,7 +96,8 @@ export class GrpcServer extends Context implements Server {
       const pkgMeta = proto[config.PROTO_PACKAGE] as grpc.GrpcObject;
       // tslint:disable-next-line:no-any
       const serviceMeta = pkgMeta[config.SERVICE_NAME] as any;
-      const serviceDef: Service = serviceMeta.service;
+      // tslint:disable-next-line:no-any
+      const serviceDef: grpc.ServiceDefinition<any> = serviceMeta.service;
       this.server.addService(serviceDef, {
         [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName),
       });
@@ -113,10 +114,12 @@ export class GrpcServer extends Context implements Server {
   private setupGrpcCall<T>(
     ctor: ControllerClass,
     methodName: string,
-  ): grpc.handleUnaryCall {
+    // tslint:disable-next-line:no-any
+  ): grpc.handleUnaryCall<grpc.ServerUnaryCall<any>, any> {
     const context: Context = this;
     return function(
-      call: grpc.ServerUnaryCall,
+      // tslint:disable-next-line:no-any
+      call: grpc.ServerUnaryCall<any>,
       // tslint:disable-next-line:no-any
       callback: (err: any, value?: T) => void,
     ) {

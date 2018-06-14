@@ -13,7 +13,7 @@ import {Greeter, HelloRequest, HelloReply} from './greeter.proto';
 
 // tslint:disable:no-any
 
-/** 
+/**
 Only run this on grpc typescript generation issues
 Comment all tests to do so.
 const app: Application = givenApplication();
@@ -72,7 +72,10 @@ describe('GrpcComponent', () => {
         protected controller: {[method: string]: Function},
         @inject(GrpcBindings.GRPC_METHOD_NAME) protected method: string,
       ) {}
-      async unaryCall(call: grpcModule.ServerUnaryCall): Promise<HelloReply> {
+      // tslint:disable-next-line:no-any
+      async unaryCall(
+        call: grpcModule.ServerUnaryCall<any>,
+      ): Promise<HelloReply> {
         // Do something before call
         const reply = await this.controller[this.method](call.request);
         reply.message += ' Sequenced';
