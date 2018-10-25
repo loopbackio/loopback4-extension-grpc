@@ -1,6 +1,7 @@
 import {
   Application,
   CoreBindings,
+  BindingKey,
   Server,
   ControllerClass,
 } from '@loopback/core';
@@ -35,6 +36,9 @@ export class GrpcServer extends Context implements Server {
    * GRPCBindings.CONFIG).
    *
    */
+
+  listening: boolean = true;
+
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) protected app: Application,
     @inject(GrpcBindings.GRPC_SERVER) protected server: grpc.Server,
@@ -126,7 +130,6 @@ export class GrpcServer extends Context implements Server {
       handleUnary().then(
         result => callback(null, result),
         error => {
-          debugger;
           callback(error);
         },
       );
@@ -137,9 +140,8 @@ export class GrpcServer extends Context implements Server {
           .toClass(ctor)
           .inScope(BindingScope.CONTEXT);
         context.bind(GrpcBindings.GRPC_METHOD_NAME).to(methodName);
-        const sequence: GrpcSequence = await context.get(
-          GrpcBindings.GRPC_SEQUENCE,
-        );
+        const key: BindingKey<GrpcSequence> = BindingKey.create<GrpcSequence>(GrpcBindings.GRPC_SEQUENCE);
+        const sequence: GrpcSequence = await context.get(key);
         return sequence.unaryCall(call);
       }
     };
