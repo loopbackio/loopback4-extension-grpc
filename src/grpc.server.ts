@@ -130,7 +130,6 @@ export class GrpcServer extends Context implements Server {
       handleUnary().then(
         result => callback(null, result),
         error => {
-          debugger;
           callback(error);
         },
       );
