@@ -31,4 +31,20 @@ export class GrpcSequence implements GrpcSequenceInterface {
     // Do something after call
     return reply;
   }
+
+  // tslint:disable-next-line:no-any
+  async clientStreamingCall(clientStream: grpc.ServerReadableStream<any>): Promise<any> {
+    const reply = await this.controller[this.method](clientStream);
+    return reply;
+  }
+
+  // tslint:disable-next-line:no-any
+  processServerStream(stream: grpc.ServerWriteableStream<any>): void {
+    this.controller[this.method](stream);
+  }
+
+  // tslint:disable-next-line:no-any
+  processBidiStream(stream: grpc.ServerDuplexStream<any, any>): void {
+    this.controller[this.method](stream);
+  }
 }
