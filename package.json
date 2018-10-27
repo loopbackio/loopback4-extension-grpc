@@ -1,6 +1,6 @@
 {
   "name": "@xanthous/loopback4-extension-grpc",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A gRPC extencion for LoopBack Next",
   "main": "index.js",
   "engines": {
