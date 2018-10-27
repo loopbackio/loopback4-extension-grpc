@@ -13,7 +13,7 @@
     "clean": "lb-clean loopback-grpc*.tgz dist package api-docs",
     "prepublishOnly": "npm run build && npm run build:apidocs",
     "pretest": "npm run lint:fix && npm run clean && npm run build",
-    "test": "lb-mocha \"DIST/test/unit/**/*.js\" \"DIST/test/acceptance/**/*.js\"",
+    "test": "lb-mocha \"dist/test/unit/**/*.js\" \"dist/test/acceptance/**/*.js\"",
     "lint": "npm run prettier:check && npm run tslint",
     "lint:fix": "npm run prettier:fix && npm run tslint:fix",
     "tslint": "lb-tslint --project tsconfig.json",
