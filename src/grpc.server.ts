@@ -100,7 +100,8 @@ export class GrpcServer extends Context implements Server {
       // tslint:disable-next-line:no-any
       const serviceMeta = pkgMeta[config.SERVICE_NAME] as any;
       // tslint:disable-next-line:no-any
-      const serviceDef: grpc.ServiceDefinition<any> = serviceMeta.service;
+      const serviceDef: grpc.ServiceDefinition<any> =
+        { [methodName]: serviceMeta.service[methodName] };
       this.server.addService(serviceDef, {
         [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName, config),
       });
