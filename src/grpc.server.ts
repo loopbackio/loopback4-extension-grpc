@@ -1,17 +1,17 @@
 import {
   Application,
   CoreBindings,
+  BindingKey,
   Server,
   ControllerClass,
 } from '@loopback/core';
 import {MetadataInspector} from '@loopback/metadata';
-import {Context, inject, Constructor} from '@loopback/context';
+import {Context, inject} from '@loopback/context';
 import {GRPC_METHODS} from './decorators/grpc.decorator';
 import {GrpcBindings} from './keys';
 import {GrpcSequence} from './grpc.sequence';
 import {Config} from './types';
 import * as grpc from 'grpc';
-import {Service} from 'protobufjs';
 import {GrpcGenerator} from './grpc.generator';
 import {BindingScope} from '@loopback/context/dist/src/binding';
 const debug = require('debug')('loopback:grpc:server');
@@ -35,6 +35,9 @@ export class GrpcServer extends Context implements Server {
    * GRPCBindings.CONFIG).
    *
    */
+
+  listening: boolean = true;
+
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) protected app: Application,
     @inject(GrpcBindings.GRPC_SERVER) protected server: grpc.Server,
@@ -97,9 +100,10 @@ export class GrpcServer extends Context implements Server {
       // tslint:disable-next-line:no-any
       const serviceMeta = pkgMeta[config.SERVICE_NAME] as any;
       // tslint:disable-next-line:no-any
-      const serviceDef: grpc.ServiceDefinition<any> = serviceMeta.service;
+      const serviceDef: grpc.ServiceDefinition<any> =
+        { [methodName]: serviceMeta.service[methodName] };
       this.server.addService(serviceDef, {
-        [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName),
+        [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName, config),
       });
     }
   }
@@ -107,41 +111,81 @@ export class GrpcServer extends Context implements Server {
    * @method setupGrpcCall
    * @author Miroslav Bajtos
    * @author Jonathan Casarrubias
+   * @author Simon Liang
    * @license MIT
-   * @param prototype
+   * @param ctor
    * @param methodName
    */
   private setupGrpcCall<T>(
     ctor: ControllerClass,
     methodName: string,
+    config: Config.Method
     // tslint:disable-next-line:no-any
-  ): grpc.handleUnaryCall<grpc.ServerUnaryCall<any>, any> {
+  ): grpc.handleCall<any, any> {
     const context: Context = this;
-    return function(
-      // tslint:disable-next-line:no-any
-      call: grpc.ServerUnaryCall<any>,
-      // tslint:disable-next-line:no-any
-      callback: (err: any, value?: T) => void,
-    ) {
-      handleUnary().then(
-        result => callback(null, result),
-        error => {
-          debugger;
-          callback(error);
-        },
-      );
-      async function handleUnary(): Promise<T> {
-        context.bind(GrpcBindings.CONTEXT).to(context);
-        context
-          .bind(GrpcBindings.GRPC_CONTROLLER)
-          .toClass(ctor)
-          .inScope(BindingScope.CONTEXT);
-        context.bind(GrpcBindings.GRPC_METHOD_NAME).to(methodName);
-        const sequence: GrpcSequence = await context.get(
-          GrpcBindings.GRPC_SEQUENCE,
-        );
-        return sequence.unaryCall(call);
+
+    context.bind(GrpcBindings.CONTEXT).to(context);
+    context
+      .bind(GrpcBindings.GRPC_CONTROLLER)
+      .toClass(ctor)
+      .inScope(BindingScope.CONTEXT);
+    context.bind(GrpcBindings.GRPC_METHOD_NAME).to(methodName);
+    const bindingKey: BindingKey<GrpcSequence> = BindingKey.create<GrpcSequence>(GrpcBindings.GRPC_SEQUENCE);
+
+    if (config.REQUEST_STREAM) {
+      if (config.RESPONSE_STREAM) {
+        // bidi stream
+        return function(
+          // tslint:disable-next-line:no-any
+          bidiStream: grpc.ServerDuplexStream<any, any>
+        ) {
+          context.get(bindingKey).then((sequence: GrpcSequence) => sequence.processBidiStream(bidiStream));
+        };
+      } else {
+        // client streaming
+        return function(
+          // tslint:disable-next-line:no-any
+          clientStream: grpc.ServerReadableStream<any>,
+          // tslint:disable-next-line:no-any
+          callback: grpc.sendUnaryData<any>
+        ) {
+          handleClientStream().then(
+            result => callback(null, result),
+            error => callback(error, null),
+          );
+          async function handleClientStream(): Promise<T> {
+            const sequence: GrpcSequence = await context.get(bindingKey);
+            return sequence.clientStreamingCall(clientStream);
+          }
+        }
       }
-    };
+    } else {
+      if (config.RESPONSE_STREAM) {
+        // server streaming
+        return function(
+          // tslint:disable-next-line:no-any
+          serverStream: grpc.ServerWriteableStream<any>
+        ) {
+          context.get(bindingKey).then((sequence: GrpcSequence) => sequence.processServerStream(serverStream));
+        }
+      } else {
+        // unary call
+        return function(
+          // tslint:disable-next-line:no-any
+          call: grpc.ServerUnaryCall<any>,
+          // tslint:disable-next-line:no-any
+          callback: grpc.sendUnaryData<any>,
+        ) {
+          handleUnary().then(
+            result => callback(null, result),
+            error => callback(error, null),
+          );
+          async function handleUnary(): Promise<T> {
+            const sequence: GrpcSequence = await context.get(bindingKey);
+            return sequence.unaryCall(call);
+          }
+        };
+      }
+    }
   }
 }
