@@ -1,11 +1,11 @@
 // Copyright IBM Corp. 2017. All Rights Reserved.
-// Node module: loopback4-extension-starter
+// Node module: loopback4-extension-grpc
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 import {inject, Provider} from '@loopback/context';
 import {GrpcGenerator} from '../grpc.generator';
 import {GrpcBindings} from '../keys';
-import {Config} from '../types';
+import {GrpcService} from '../types';
 /**
  * @class GeneratorProvider
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -16,7 +16,7 @@ import {Config} from '../types';
  */
 export class GeneratorProvider implements Provider<GrpcGenerator> {
   private generator: GrpcGenerator;
-  constructor(@inject(GrpcBindings.CONFIG) protected config: Config.Component) {
+  constructor(@inject(GrpcBindings.CONFIG) protected config: GrpcService) {
     this.generator = new GrpcGenerator(config);
   }
   public value(): GrpcGenerator {
