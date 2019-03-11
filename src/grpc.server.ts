@@ -1,20 +1,19 @@
+import {BindingScope, Context, inject} from '@loopback/context';
 import {
   Application,
+  ControllerClass,
   CoreBindings,
   Server,
-  ControllerClass,
 } from '@loopback/core';
 import {MetadataInspector} from '@loopback/metadata';
-import {Context, inject, Constructor} from '@loopback/context';
-import {GRPC_METHODS} from './decorators/grpc.decorator';
-import {GrpcBindings} from './keys';
-import {GrpcSequence} from './grpc.sequence';
-import {Config} from './types';
 import * as grpc from 'grpc';
-import {Service} from 'protobufjs';
+import {GRPC_METHODS} from './decorators/grpc.decorator';
 import {GrpcGenerator} from './grpc.generator';
-import {BindingScope} from '@loopback/context/dist/src/binding';
-const debug = require('debug')('loopback:grpc:server');
+import {GrpcBindings} from './keys';
+import {GrpcMethod} from './types';
+
+// tslint:disable:no-any
+
 /**
  * @class GrpcServer
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -23,6 +22,7 @@ const debug = require('debug')('loopback:grpc:server');
  * This Class provides a LoopBack Server implementing GRPC
  */
 export class GrpcServer extends Context implements Server {
+  private _listening = false;
   /**
    * @memberof GrpcServer
    * Creates an instance of GrpcServer.
@@ -58,34 +58,32 @@ export class GrpcServer extends Context implements Server {
     }
   }
 
+  public get listening() {
+    return this._listening;
+  }
+
   async start(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.server.bind(
-        `${this.host}:${this.port}`,
-        grpc.ServerCredentials.createInsecure(),
-      );
-      this.server.start();
-      resolve();
-    });
+    this.server.bind(
+      `${this.host}:${this.port}`,
+      grpc.ServerCredentials.createInsecure(),
+    );
+    this.server.start();
+    this._listening = true;
   }
 
   async stop(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.server.forceShutdown();
-      resolve();
-    });
+    this.server.forceShutdown();
+    this._listening = false;
   }
 
   private _setupControllerMethods(ctor: ControllerClass) {
-    const className = ctor.name || '<UnknownClass>';
     const controllerMethods =
-      MetadataInspector.getAllMethodMetadata<Config.Method>(
+      MetadataInspector.getAllMethodMetadata<GrpcMethod>(
         GRPC_METHODS,
         ctor.prototype,
       ) || {};
 
     for (const methodName in controllerMethods) {
-      const fullName = `${className}.${methodName}`;
       const config = controllerMethods[methodName];
 
       const proto: grpc.GrpcObject = this.generator.getProto(config.PROTO_NAME);
@@ -94,9 +92,9 @@ export class GrpcServer extends Context implements Server {
       }
 
       const pkgMeta = proto[config.PROTO_PACKAGE] as grpc.GrpcObject;
-      // tslint:disable-next-line:no-any
+
       const serviceMeta = pkgMeta[config.SERVICE_NAME] as any;
-      // tslint:disable-next-line:no-any
+
       const serviceDef: grpc.ServiceDefinition<any> = serviceMeta.service;
       this.server.addService(serviceDef, {
         [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName),
@@ -114,13 +112,10 @@ export class GrpcServer extends Context implements Server {
   private setupGrpcCall<T>(
     ctor: ControllerClass,
     methodName: string,
-    // tslint:disable-next-line:no-any
   ): grpc.handleUnaryCall<grpc.ServerUnaryCall<any>, any> {
     const context: Context = this;
     return function(
-      // tslint:disable-next-line:no-any
       call: grpc.ServerUnaryCall<any>,
-      // tslint:disable-next-line:no-any
       callback: (err: any, value?: T) => void,
     ) {
       handleUnary().then(
@@ -135,11 +130,9 @@ export class GrpcServer extends Context implements Server {
         context
           .bind(GrpcBindings.GRPC_CONTROLLER)
           .toClass(ctor)
-          .inScope(BindingScope.CONTEXT);
+          .inScope(BindingScope.SINGLETON);
         context.bind(GrpcBindings.GRPC_METHOD_NAME).to(methodName);
-        const sequence: GrpcSequence = await context.get(
-          GrpcBindings.GRPC_SEQUENCE,
-        );
+        const sequence = await context.get(GrpcBindings.GRPC_SEQUENCE);
         return sequence.unaryCall(call);
       }
     };

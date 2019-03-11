@@ -1,17 +1,16 @@
 // Copyright IBM Corp. 2017. All Rights Reserved.
-// Node module: loopback4-extension-starter
+// Node module: loopback4-extension-grpc
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
-import {expect} from '@loopback/testlab';
-import {MetadataInspector} from '@loopback/metadata';
-import {grpc, GrpcBindings, Config, GRPC_METHODS} from '../../..';
 
+import {MetadataInspector} from '@loopback/metadata';
+import {expect} from '@loopback/testlab';
+import {grpc, GRPC_METHODS} from '../../..';
 import {
   Greeter,
-  HelloRequest,
   HelloReply,
+  HelloRequest,
 } from '../../acceptance/greeter.proto';
-import {Reflector} from '@loopback/context';
 
 describe('@rpc decorator', () => {
   it('defines reflection metadata for rpc method', () => {
@@ -25,7 +24,6 @@ describe('@rpc decorator', () => {
       }
     }
 
-    const proto = GreeterCtrl.prototype;
     const controllerMethods = MetadataInspector.getAllMethodMetadata(
       GRPC_METHODS,
       GreeterCtrl.prototype,

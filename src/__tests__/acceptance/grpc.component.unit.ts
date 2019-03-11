@@ -1,15 +1,20 @@
 // Copyright IBM Corp. 2017. All Rights Reserved.
-// Node module: loopback4-extension-starter
+// Node module: loopback4-extension-grpc
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
-import {expect} from '@loopback/testlab';
-import {inject, Constructor} from '@loopback/context';
+import {Constructor, inject} from '@loopback/context';
 import {Application} from '@loopback/core';
-import {GrpcSequenceInterface, Config, GrpcServer, GrpcSequence} from '../../';
-import {grpc} from '../../';
+import {expect} from '@loopback/testlab';
 import * as grpcModule from 'grpc';
-import {GrpcComponent, GrpcBindings} from '../..';
-import {Greeter, HelloRequest, HelloReply} from './greeter.proto';
+import {
+  grpc,
+  GrpcBindings,
+  GrpcComponent,
+  GrpcSequenceInterface,
+  GrpcServer,
+  GrpcService,
+} from '../..';
+import {Greeter, HelloReply, HelloRequest} from './greeter.proto';
 
 // tslint:disable:no-any
 
@@ -103,7 +108,7 @@ describe('GrpcComponent', () => {
 function givenApplication(
   sequence?: Constructor<GrpcSequenceInterface>,
 ): Application {
-  const grpcConfig: Config.Component = {port: 8080};
+  const grpcConfig: GrpcService = {port: 8080};
   if (sequence) {
     grpcConfig.sequence = sequence;
   }
@@ -117,7 +122,7 @@ function givenApplication(
  * Returns GRPC Client
  **/
 function getGrpcClient(app: Application) {
-  const proto = grpcModule.load('./test/acceptance/greeter.proto')[
+  const proto = grpcModule.load('./fixtures/greeter.proto')[
     'greeterpackage'
   ] as grpcModule.GrpcObject;
   const client = proto.Greeter as typeof grpcModule.Client;

@@ -14,8 +14,8 @@ import {GrpcBindings} from './keys';
 import {ServerProvider} from './providers/server.provider';
 import {GrpcServer} from './grpc.server';
 import {GrpcSequence} from './grpc.sequence';
-import {Config} from './types';
 import {GeneratorProvider} from './providers/generator.provider';
+import {GrpcService} from './types';
 /**
  * @class Grpc Component
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -27,7 +27,7 @@ export class GrpcComponent implements Component {
    * Export GrpcProviders
    */
   providers: ProviderMap = {
-    [GrpcBindings.GRPC_SERVER]: ServerProvider,
+    [GrpcBindings.GRPC_SERVER.toString()]: ServerProvider,
     [GrpcBindings.GRPC_GENERATOR]: GeneratorProvider,
   };
   /**
@@ -39,7 +39,7 @@ export class GrpcComponent implements Component {
 
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) app: Application,
-    @inject(GrpcBindings.CONFIG) config: Config.Component,
+    @inject(GrpcBindings.CONFIG) config: GrpcService,
   ) {
     // Set default configuration for this component
     config = Object.assign(
@@ -52,10 +52,9 @@ export class GrpcComponent implements Component {
     // Bind host, port, proto path, package and sequence
     app.bind(GrpcBindings.HOST).to(config.host);
     app.bind(GrpcBindings.PORT).to(config.port);
-    if (config.sequence) {
-      app.bind(GrpcBindings.GRPC_SEQUENCE).toClass(config.sequence);
-    } else {
-      app.bind(GrpcBindings.GRPC_SEQUENCE).toClass(GrpcSequence);
-    }
+
+    app
+      .bind(GrpcBindings.GRPC_SEQUENCE)
+      .toClass(config.sequence || GrpcSequence);
   }
 }

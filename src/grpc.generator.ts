@@ -1,8 +1,9 @@
-import {Config} from './types';
 import {execSync} from 'child_process';
-import * as grpc from 'grpc';
-import * as path from 'path';
 import * as glob from 'glob';
+import * as grpc from 'grpc';
+import {GrpcObject} from 'grpc';
+import * as path from 'path';
+import {GrpcService} from './types';
 /**
  * @class GrpcGenerator
  * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -14,13 +15,13 @@ import * as glob from 'glob';
  */
 export class GrpcGenerator {
   /**
-   * @property {[name: string]: grpc.GrpcObject} protos
+   * @property {[name: string]: GrpcObject} protos
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @description proto instances directory loaded during
    * boot time and later being used by implemented grpc
    * controllers.
    */
-  private protos: {[name: string]: grpc.GrpcObject} = {};
+  private protos: {[name: string]: GrpcObject} = {};
   /**
    * @method constructor
    * @param config
@@ -28,7 +29,7 @@ export class GrpcGenerator {
    * @description
    * Receives generator configurations
    */
-  constructor(protected config: Config.Component) {}
+  constructor(protected config: GrpcService) {}
   /**
    * @method execute
    * @author Jonathan Casarrubias <t: johncasarrubias>
@@ -47,27 +48,27 @@ export class GrpcGenerator {
   /**
    * @method getProto
    * @param {string} name
-   * @returns {grpc.GrpcObject}
+   * @returns {GrpcObject}
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
    * @description This method will return a proto instance
    * from the proto list directory, previously loaded during
    * boot time.
    */
-  public getProto(name: string): grpc.GrpcObject {
+  public getProto(name: string): GrpcObject {
     return this.protos[name];
   }
   /**
    * @method loadProto
    * @param {string} protoPath
-   * @returns {grpc.GrpcObject}
+   * @returns {GrpcObject}
    * @author Jonathan Casarrubias <t: johncasarrubias>
    * @license MIT
    * @description This method receive a proto file path and
    * load that proto using the official grpc library.
    */
-  public loadProto(protoPath: string): grpc.GrpcObject {
-    const proto: grpc.GrpcObject = grpc.load(protoPath);
+  public loadProto(protoPath: string): GrpcObject {
+    const proto: GrpcObject = grpc.load(protoPath);
     return proto;
   }
   /**
@@ -105,7 +106,6 @@ export class GrpcGenerator {
     return execSync(
       `${path.join(
         __dirname,
-        '../',
         '../', // Root of grpc module and not the dist dir
         'compilers',
         process.platform,

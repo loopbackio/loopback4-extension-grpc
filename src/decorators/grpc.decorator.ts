@@ -1,10 +1,10 @@
 // Copyright IBM Corp. 2017. All Rights Reserved.
-// Node module: loopback4-extension-starter
+// Node module: loopback4-extension-grpc
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
 import {MethodDecoratorFactory} from '@loopback/metadata';
-import {Config} from '../types';
+import {GrpcMethod} from '../types';
 
 export const GRPC_METHODS = 'grpc:methods';
 
@@ -34,6 +34,6 @@ export const GRPC_METHODS = 'grpc:methods';
  *   }
  * }
  */
-export function grpc(config: Config.Method) {
-  return MethodDecoratorFactory.createDecorator(GRPC_METHODS, config);
+export function grpc(spec: GrpcMethod) {
+  return MethodDecoratorFactory.createDecorator(GRPC_METHODS, spec);
 }
