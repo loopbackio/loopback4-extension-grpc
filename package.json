@@ -8,10 +8,9 @@
   },
   "scripts": {
     "build": "lb-tsc",
-    "build:apidocs": "lb-apidocs",
     "build:watch": "lb-tsc --watch",
     "clean": "lb-clean loopback-grpc*.tgz dist package api-docs *.tsbuildinfo",
-    "prepublishOnly": "npm run build && npm run build:apidocs",
+    "prepublishOnly": "npm run build",
     "pretest": "npm run lint:fix && npm run clean && npm run build",
     "test": "lb-mocha \"dist/__tests__/**/*.js\"",
     "lint": "npm run prettier:check && npm run eslint",
