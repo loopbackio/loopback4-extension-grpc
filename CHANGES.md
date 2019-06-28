@@ -1,3 +1,9 @@
+2019-06-28, Version 0.1.1
+=========================
+
+ * fix: remove apidocs generation (Raymond Feng)
+
+
 2019-06-28, Version 0.1.0
 =========================
 
