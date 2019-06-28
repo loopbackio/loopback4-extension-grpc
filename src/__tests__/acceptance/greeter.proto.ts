@@ -24,12 +24,12 @@ export namespace Greeter {
    * from the given gRPC Greeter service.
    */
   export namespace SayHello {
-    export const PROTO_NAME: string = 'greeter.proto';
-    export const PROTO_PACKAGE: string = 'greeterpackage';
-    export const SERVICE_NAME: string = 'Greeter';
-    export const METHOD_NAME: string = 'SayHello';
-    export const REQUEST_STREAM: boolean = false;
-    export const RESPONSE_STREAM: boolean = false;
+    export const PROTO_NAME = 'greeter.proto';
+    export const PROTO_PACKAGE = 'greeterpackage';
+    export const SERVICE_NAME = 'Greeter';
+    export const METHOD_NAME = 'SayHello';
+    export const REQUEST_STREAM = false;
+    export const RESPONSE_STREAM = false;
   }
 }
 /**

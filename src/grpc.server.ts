@@ -12,7 +12,7 @@ import {GrpcGenerator} from './grpc.generator';
 import {GrpcBindings} from './keys';
 import {GrpcMethod} from './types';
 
-// tslint:disable:no-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * @class GrpcServer
@@ -121,7 +121,6 @@ export class GrpcServer extends Context implements Server {
       handleUnary().then(
         result => callback(null, result),
         error => {
-          debugger;
           callback(error);
         },
       );
