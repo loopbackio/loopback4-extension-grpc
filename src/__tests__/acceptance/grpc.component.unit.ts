@@ -16,7 +16,7 @@ import {
 } from '../..';
 import {Greeter, HelloReply, HelloRequest} from './greeter.proto';
 
-// tslint:disable:no-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
 Only run this on grpc typescript generation issues

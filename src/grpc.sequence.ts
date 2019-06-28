@@ -8,7 +8,7 @@ import {GrpcBindings} from './keys';
  * @description Interface that describes a GRPC Sequence
  */
 export interface GrpcSequenceInterface {
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   unaryCall(request: ServerUnaryCall<any>): Promise<any>;
 }
 /**
@@ -24,7 +24,7 @@ export class GrpcSequence implements GrpcSequenceInterface {
     @inject(GrpcBindings.GRPC_METHOD_NAME) protected method: string,
   ) {}
 
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async unaryCall(call: ServerUnaryCall<any>): Promise<any> {
     // Do something before call
     const reply = await this.controller[this.method](call.request);
