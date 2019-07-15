@@ -103,6 +103,7 @@ export class GrpcGenerator {
    */
   private generate(proto: string): Buffer {
     const root = path.dirname(proto);
+    const isWin = process.platform === "win32";
     return execSync(
       `${path.join(
         __dirname,
@@ -110,12 +111,12 @@ export class GrpcGenerator {
         'compilers',
         process.platform,
         'bin',
-        'protoc',
+        `protoc${isWin ? '.exe' : ''}`,
       )} --plugin=protoc-gen-ts=${path.join(
         process.cwd(),
         'node_modules',
         '.bin',
-        'protoc-gen-ts',
+        `protoc-gen-ts${isWin ? '.cmd' : ''}`,
       )} --ts_out service=true:${root} -I ${root} ${proto}`,
     );
   }
