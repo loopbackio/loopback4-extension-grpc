@@ -1,7 +1,8 @@
-// Copyright IBM Corp. 2017. All Rights Reserved.
-// Node module: loopback4-extension-grpc
+// Copyright IBM Corp. 2017,2019. All Rights Reserved.
+// Node module: @loopback/grpc
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
+
 export * from './providers/server.provider';
 export * from './decorators/grpc.decorator';
 export * from './grpc.server';

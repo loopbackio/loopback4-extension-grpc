@@ -1,26 +1,22 @@
+// Copyright IBM Corp. 2019. All Rights Reserved.
+// Node module: @loopback/grpc
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
+
 export namespace Greeter {
   /**
-   * @interface Greeter.Service
-   * @author Jonathan Casarrubias <t: johncasarrubias>
-   * @license MIT
-   * @description Greeter interface that provides types
+   * Greeter interface that provides types
    * for methods from the given gRPC Greeter Service.
    */
   export interface Service {
     /**
-     * @method Greeter.Service.sayHello
-     * @author Jonathan Casarrubias <t: johncasarrubias>
-     * @license MIT
-     * @description Greeter method declaration
+     * Greeter method declaration
      * from the given gRPC Greeter service.
      */
     sayHello(request: HelloRequest): HelloReply;
   }
   /**
-   * @namespace Greeter.SayHello
-   * @author Jonathan Casarrubias <t: johncasarrubias>
-   * @license MIT
-   * @description Greeter method configuration
+   * Greeter method configuration
    * from the given gRPC Greeter service.
    */
   export namespace SayHello {
