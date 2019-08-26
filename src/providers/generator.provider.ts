@@ -1,16 +1,14 @@
-// Copyright IBM Corp. 2017. All Rights Reserved.
-// Node module: loopback4-extension-grpc
+// Copyright IBM Corp. 2017,2019. All Rights Reserved.
+// Node module: @loopback/grpc
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
+
 import {inject, Provider} from '@loopback/context';
 import {GrpcGenerator} from '../grpc.generator';
 import {GrpcBindings} from '../keys';
 import {GrpcService} from '../types';
 /**
- * @class GeneratorProvider
- * @author Jonathan Casarrubias <t: johncasarrubias>
- * @license MIT
- * @description This provider will return a GRPC TypeScript Generator
+ * This provider will return a GRPC TypeScript Generator
  * This can be used to generate typescript files and service declarations
  * from proto files on run time.
  */

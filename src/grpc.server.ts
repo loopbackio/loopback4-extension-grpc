@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2017,2019. All Rights Reserved.
+// Node module: @loopback/grpc
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
+
 import {BindingScope, Context, inject} from '@loopback/context';
 import {
   Application,
@@ -15,11 +20,7 @@ import {GrpcMethod} from './types';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * @class GrpcServer
- * @author Jonathan Casarrubias <t: johncasarrubias>
- * @license MIT
- * @description
- * This Class provides a LoopBack Server implementing GRPC
+ * This Class provides a LoopBack Server implementing gRPC
  */
 export class GrpcServer extends Context implements Server {
   private _listening = false;
@@ -27,11 +28,11 @@ export class GrpcServer extends Context implements Server {
    * @memberof GrpcServer
    * Creates an instance of GrpcServer.
    *
-   * @param {Application} app The application instance (injected via
+   * @param app - The application instance (injected via
    * CoreBindings.APPLICATION_INSTANCE).
-   * @param {grpc.Server} server The actual GRPC Server module (injected via
+   * @param server - The actual GRPC Server module (injected via
    * GrpcBindings.GRPC_SERVER).
-   * @param {GRPCServerConfig=} options The configuration options (injected via
+   * @param options - The configuration options (injected via
    * GRPCBindings.CONFIG).
    *
    */
@@ -103,9 +104,6 @@ export class GrpcServer extends Context implements Server {
   }
   /**
    * @method setupGrpcCall
-   * @author Miroslav Bajtos
-   * @author Jonathan Casarrubias
-   * @license MIT
    * @param prototype
    * @param methodName
    */
@@ -113,27 +111,25 @@ export class GrpcServer extends Context implements Server {
     ctor: ControllerClass,
     methodName: string,
   ): grpc.handleUnaryCall<grpc.ServerUnaryCall<any>, any> {
-    const context: Context = this;
-    return function(
+    return (
       call: grpc.ServerUnaryCall<any>,
       callback: (err: any, value?: T) => void,
-    ) {
+    ) => {
+      const handleUnary = async (): Promise<T> => {
+        this.bind(GrpcBindings.CONTEXT).to(this);
+        this.bind(GrpcBindings.GRPC_CONTROLLER)
+          .toClass(ctor)
+          .inScope(BindingScope.SINGLETON);
+        this.bind(GrpcBindings.GRPC_METHOD_NAME).to(methodName);
+        const sequence = await this.get(GrpcBindings.GRPC_SEQUENCE);
+        return sequence.unaryCall(call);
+      };
       handleUnary().then(
         result => callback(null, result),
         error => {
           callback(error);
         },
       );
-      async function handleUnary(): Promise<T> {
-        context.bind(GrpcBindings.CONTEXT).to(context);
-        context
-          .bind(GrpcBindings.GRPC_CONTROLLER)
-          .toClass(ctor)
-          .inScope(BindingScope.SINGLETON);
-        context.bind(GrpcBindings.GRPC_METHOD_NAME).to(methodName);
-        const sequence = await context.get(GrpcBindings.GRPC_SEQUENCE);
-        return sequence.unaryCall(call);
-      }
     };
   }
 }

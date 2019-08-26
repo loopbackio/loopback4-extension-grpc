@@ -1,7 +1,8 @@
-// Copyright IBM Corp. 2017. All Rights Reserved.
-// Node module: loopback4-extension-grpc
+// Copyright IBM Corp. 2017,2019. All Rights Reserved.
+// Node module: @loopback/grpc
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
+
 import {
   Component,
   ProviderMap,
@@ -17,10 +18,7 @@ import {GrpcSequence} from './grpc.sequence';
 import {GeneratorProvider} from './providers/generator.provider';
 import {GrpcService} from './types';
 /**
- * @class Grpc Component
- * @author Jonathan Casarrubias <t: johncasarrubias>
- * @license MIT
- * @description Grpc Component for LoopBack 4.
+ * Grpc Component for LoopBack 4.
  */
 export class GrpcComponent implements Component {
   /**

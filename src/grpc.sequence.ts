@@ -1,21 +1,22 @@
+// Copyright IBM Corp. 2017,2019. All Rights Reserved.
+// Node module: @loopback/grpc
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
+
 import {inject} from '@loopback/context';
 import {ServerUnaryCall} from 'grpc';
 import {GrpcBindings} from './keys';
+
 /**
- * @interface GrpcSequenceInterface
- * @author Jonathan Casarrubias <t: johncasarrubias>
- * @license MIT
- * @description Interface that describes a GRPC Sequence
+ * Interface that describes a GRPC Sequence
  */
 export interface GrpcSequenceInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   unaryCall(request: ServerUnaryCall<any>): Promise<any>;
 }
+
 /**
- * @class GrpcSequence
- * @author Jonathan Casarrubias <t: johncasarrubias>
- * @license MIT
- * @description GRPC Sequence
+ * GRPC Sequence
  */
 export class GrpcSequence implements GrpcSequenceInterface {
   constructor(
