@@ -10,6 +10,8 @@ import {
   Greeter,
   HelloReply,
   HelloRequest,
+  TestRequest,
+  TestReply,
 } from '../../acceptance/greeter.proto';
 
 describe('@rpc decorator', () => {
@@ -19,6 +21,14 @@ describe('@rpc decorator', () => {
       sayHello(request: HelloRequest): HelloReply {
         return {message: `hello ${request.name}`};
       }
+
+      @grpc(Greeter.SayTest)
+      sayTest(request: TestRequest): TestReply {
+        return {
+          message: 'Test ' + request.name,
+        };
+      }
+
       Helper(): boolean {
         return true;
       }

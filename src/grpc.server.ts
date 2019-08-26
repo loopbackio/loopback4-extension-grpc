@@ -17,6 +17,9 @@ import {GrpcGenerator} from './grpc.generator';
 import {GrpcBindings} from './keys';
 import {GrpcMethod} from './types';
 
+import * as debugFactory from 'debug';
+const debug = debugFactory('loopback:grpc');
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
@@ -84,26 +87,48 @@ export class GrpcServer extends Context implements Server {
         ctor.prototype,
       ) || {};
 
+    const services = new Map<
+      grpc.ServiceDefinition<any>,
+      {[method: string]: grpc.handleUnaryCall<grpc.ServerUnaryCall<any>, any>}
+    >();
+
     for (const methodName in controllerMethods) {
       const config = controllerMethods[methodName];
+      debug('Config for method %s', methodName, config);
 
       const proto: grpc.GrpcObject = this.generator.getProto(config.PROTO_NAME);
+      debug('Proto for %s', config.PROTO_NAME, proto);
+
       if (!proto) {
         throw new Error(`Grpc Server: No proto file was provided.`);
       }
 
       const pkgMeta = proto[config.PROTO_PACKAGE] as grpc.GrpcObject;
+      debug('Package for %s', config.PROTO_PACKAGE, pkgMeta);
 
       const serviceMeta = pkgMeta[config.SERVICE_NAME] as any;
+      debug('Service for %s', config.SERVICE_NAME, serviceMeta);
 
       const serviceDef: grpc.ServiceDefinition<any> = serviceMeta.service;
-      this.server.addService(serviceDef, {
-        [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName),
-      });
+      if (!services.has(serviceDef)) {
+        services.set(serviceDef, {
+          [config.METHOD_NAME]: this.setupGrpcCall(ctor, methodName),
+        });
+      } else {
+        const methods = services.get(serviceDef)!;
+        methods[config.METHOD_NAME] = this.setupGrpcCall(ctor, methodName);
+      }
+    }
+
+    for (const [service, methods] of services.entries()) {
+      if (debug.enabled) {
+        debug('Adding service:', service, Object.keys(methods));
+      }
+      this.server.addService(service, methods);
     }
   }
   /**
-   * @method setupGrpcCall
+   * Set up gRPC call
    * @param prototype
    * @param methodName
    */

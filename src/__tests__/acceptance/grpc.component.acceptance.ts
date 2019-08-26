@@ -15,7 +15,13 @@ import {
   GrpcServer,
   GrpcService,
 } from '../..';
-import {Greeter, HelloReply, HelloRequest} from './greeter.proto';
+import {
+  Greeter,
+  HelloReply,
+  HelloRequest,
+  TestRequest,
+  TestReply,
+} from './greeter.proto';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -46,6 +52,13 @@ describe('GrpcComponent', () => {
           message: 'Hello ' + request.name,
         };
       }
+
+      @grpc(Greeter.SayTest)
+      sayTest(request: TestRequest): TestReply {
+        return {
+          message: 'Test ' + request.name,
+        };
+      }
     }
     // Load LoopBack Application
     const app: Application = givenApplication();
@@ -69,6 +82,13 @@ describe('GrpcComponent', () => {
       sayHello(request: HelloRequest): HelloReply {
         const reply: HelloReply = {message: 'Hello ' + request.name};
         return reply;
+      }
+
+      @grpc(Greeter.SayTest)
+      sayTest(request: TestRequest): TestReply {
+        return {
+          message: 'Test ' + request.name,
+        };
       }
     }
 
