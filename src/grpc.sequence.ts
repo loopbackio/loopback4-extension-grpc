@@ -7,6 +7,9 @@ import {inject} from '@loopback/context';
 import {ServerUnaryCall} from 'grpc';
 import {GrpcBindings} from './keys';
 
+import * as debugFactory from 'debug';
+const debug = debugFactory('loopback:grpc');
+
 /**
  * Interface that describes a GRPC Sequence
  */
@@ -28,6 +31,12 @@ export class GrpcSequence implements GrpcSequenceInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async unaryCall(call: ServerUnaryCall<any>): Promise<any> {
     // Do something before call
+    debug(
+      'Calling %s.%s',
+      this.controller.constructor.name,
+      this.method,
+      call.request,
+    );
     const reply = await this.controller[this.method](call.request);
     // Do something after call
     return reply;
