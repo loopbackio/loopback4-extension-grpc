@@ -53,6 +53,6 @@ export class GrpcComponent implements Component {
 
     app
       .bind(GrpcBindings.GRPC_SEQUENCE)
-      .toClass(config.sequence || GrpcSequence);
+      .toClass(config.sequence ?? GrpcSequence);
   }
 }

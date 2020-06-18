@@ -34,7 +34,7 @@ export class GrpcGenerator {
    */
   public execute(): void {
     this.getProtoPaths().forEach((protoPath: string) => {
-      const protoName: string = protoPath.split('/').pop() || '';
+      const protoName: string = protoPath.split('/').pop() ?? '';
       this.protos[protoName] = this.loadProto(protoPath);
       this.generate(protoPath);
     });
@@ -65,10 +65,10 @@ export class GrpcGenerator {
    * typescript files generations from found proto files.
    */
   public getProtoPaths(): string[] {
-    const pattern = this.config.protoPattern || '**/*.proto';
-    const ignores = this.config.protoIngores || ['**/node_modules/**'];
+    const pattern = this.config.protoPattern ?? '**/*.proto';
+    const ignores = this.config.protoIngores ?? ['**/node_modules/**'];
     const options = {
-      cwd: this.config.cwd || process.cwd(),
+      cwd: this.config.cwd ?? process.cwd(),
       ignore: ignores,
       nodir: true,
     };
@@ -85,7 +85,7 @@ export class GrpcGenerator {
    */
   private generate(proto: string): Buffer {
     const root = path.dirname(proto);
-    const isWin = process.platform === "win32";
+    const isWin = process.platform === 'win32';
     return execSync(
       `${path.join(
         __dirname,

@@ -7,7 +7,7 @@ import {inject} from '@loopback/context';
 import {ServerUnaryCall} from 'grpc';
 import {GrpcBindings} from './keys';
 
-import * as debugFactory from 'debug';
+import debugFactory from 'debug';
 const debug = debugFactory('loopback:grpc');
 
 /**
