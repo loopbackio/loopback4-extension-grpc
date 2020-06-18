@@ -41,6 +41,7 @@ describe('GrpcComponent', () => {
     const lbGrpcServer = await app.getServer<GrpcServer>('GrpcServer');
     expect(lbGrpcServer.getSync(GrpcBindings.PORT)).to.be.eql(8080);
   });
+
   // LoopBack GRPC Service
   it('creates a grpc service', async () => {
     // Define Greeter Service Implementation

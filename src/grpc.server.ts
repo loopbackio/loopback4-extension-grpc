@@ -11,13 +11,13 @@ import {
   Server,
 } from '@loopback/core';
 import {MetadataInspector} from '@loopback/metadata';
-import * as grpc from 'grpc';
+import grpc from 'grpc';
 import {GRPC_METHODS} from './decorators/grpc.decorator';
 import {GrpcGenerator} from './grpc.generator';
 import {GrpcBindings} from './keys';
 import {GrpcMethod} from './types';
 
-import * as debugFactory from 'debug';
+import debugFactory from 'debug';
 const debug = debugFactory('loopback:grpc');
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -85,7 +85,7 @@ export class GrpcServer extends Context implements Server {
       MetadataInspector.getAllMethodMetadata<GrpcMethod>(
         GRPC_METHODS,
         ctor.prototype,
-      ) || {};
+      ) ?? {};
 
     const services = new Map<
       grpc.ServiceDefinition<any>,
@@ -150,8 +150,8 @@ export class GrpcServer extends Context implements Server {
         return sequence.unaryCall(call);
       };
       handleUnary().then(
-        result => callback(null, result),
-        error => {
+        (result) => callback(null, result),
+        (error) => {
           callback(error);
         },
       );

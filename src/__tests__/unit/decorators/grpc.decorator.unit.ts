@@ -29,7 +29,7 @@ describe('@rpc decorator', () => {
         };
       }
 
-      Helper(): boolean {
+      helper(): boolean {
         return true;
       }
     }
