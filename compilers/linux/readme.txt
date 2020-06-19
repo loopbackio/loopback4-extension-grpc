@@ -12,4 +12,4 @@ copy the contents of the 'include' directory somewhere as well, for example
 into '/usr/local/include/'.
 
 Please refer to our official github site for more installation instructions:
-  https://github.com/google/protobuf
+  https://github.com/protocolbuffers/protobuf
