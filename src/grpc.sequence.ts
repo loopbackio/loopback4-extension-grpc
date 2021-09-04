@@ -28,7 +28,10 @@ const debug = debugFactory('loopback:grpc:calls');
 export interface GrpcSequenceInterface {
   /**
    * Call controller method to handle server streaming call
-   * Maps Observable<GrpcResponse> to server stream
+   * The controller method should never have anything
+   * executed after callback call
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
@@ -38,7 +41,10 @@ export interface GrpcSequenceInterface {
 
   /**
    * Call controller method to handle client streaming call
-   * Maps client stream into Observable<GrpcRequest>
+   * The controller method should never have anything
+   * executed after callback call
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
@@ -48,7 +54,10 @@ export interface GrpcSequenceInterface {
 
   /**
    * Call controller method to handle server streaming call
-   * Maps Observable<GrpcResponse> to server stream
+   * The controller method promise should resolve
+   * when all call.write have been executed
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
@@ -58,8 +67,10 @@ export interface GrpcSequenceInterface {
 
   /**
    * Call controller method to handle bidirectional streaming call
-   * Maps client stream into Observable<GrpcRequest>
-   * Maps Observable<GrpcResponse> to server stream
+   * The controller method promise should resolve
+   * when all call.write have been executed
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
@@ -80,6 +91,10 @@ export class GrpcSequence implements GrpcSequenceInterface {
 
   /**
    * Call controller method to handle unary call
+   * The controller method should never have anything
+   * executed after callback call
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
@@ -111,7 +126,10 @@ export class GrpcSequence implements GrpcSequenceInterface {
 
   /**
    * Call controller method to handle client streaming call
-   * Maps client stream into Observable<GrpcRequest>
+   * The controller method should never have anything
+   * executed after callback call
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
@@ -138,7 +156,10 @@ export class GrpcSequence implements GrpcSequenceInterface {
 
   /**
    * Call controller method to handle server streaming call
-   * Maps Observable<GrpcResponse> to server stream
+   * The controller method promise should resolve
+   * when all call.write have been executed
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
@@ -161,8 +182,10 @@ export class GrpcSequence implements GrpcSequenceInterface {
 
   /**
    * Call controller method to handle bidirectional streaming call
-   * Maps client stream into Observable<GrpcRequest>
-   * Maps Observable<GrpcResponse> to server stream
+   * The controller method promise should resolve
+   * when all call.write have been executed
+   * If the method throws, the error is catched in grpc.server
+   * and send as an error through gRPC protocol
    * @param call
    * @returns
    */
