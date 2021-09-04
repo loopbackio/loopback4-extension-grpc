@@ -3,25 +3,18 @@ package greeterpackage;
 
 service Greeter {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
-
-  rpc SayTest (TestRequest) returns (TestReply) {}
+  rpc UnaryTest (TestRequest) returns (TestResponse) {}
+  rpc ClientStreamTest (stream TestRequest) returns (TestResponse) {}
+  rpc ServerStreamTest (TestRequest) returns (stream TestResponse) {}
+  rpc BidiStreamTest (stream TestRequest) returns (stream TestResponse) {}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
-}
-
-// The response message containing the greetings
-message HelloReply {
-  string message = 1;
-}
-
 message TestRequest {
   string name = 1;
 }
 
-message TestReply {
+// The response message containing the greetings
+message TestResponse {
   string message = 1;
 }

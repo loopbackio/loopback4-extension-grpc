@@ -8,5 +8,8 @@ export * from './decorators/grpc.decorator';
 export * from './grpc.server';
 export * from './grpc.component';
 export * from './grpc.sequence';
+export * from './grpc.controller';
 export * from './types';
 export * from './keys';
+export * from './grpc.generator';
+export * from '@grpc/grpc-js';
