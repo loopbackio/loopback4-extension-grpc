@@ -74,7 +74,7 @@ export interface GrpcComponentConfig {
      */
     tsOutputPath?: string | ((path: string) => string);
     /**
-     * Defaults to "outputServices=grpc-js,outputClientImpl=false,lowerCaseServiceMethods=true,esModuleInterop=true,outputSchema=true,env=node"
+     * Defaults to "outputServices=grpc-js,outputClientImpl=false,lowerCaseServiceMethods=true,esModuleInterop=true,useDate=false,outputSchema=true,env=node"
      * See https://github.com/stephenh/ts-proto
      */
     tsOutOptions?: string;

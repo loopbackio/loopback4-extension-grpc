@@ -143,7 +143,7 @@ export class GrpcGenerator {
         absoluteProtoPath,
       )} --ts_proto_opt=${
         this.config?.tsOutOptions ??
-        'outputServices=grpc-js,outputClientImpl=false,lowerCaseServiceMethods=true,esModuleInterop=true,outputSchema=true,env=node'
+        'outputServices=grpc-js,outputClientImpl=false,lowerCaseServiceMethods=true,esModuleInterop=true,useDate=false,outputSchema=true,env=node'
       } ${absoluteProtoPath} -I ${includeDirs} ${
         this.config?.additionalArgs ?? ''
       }`,
