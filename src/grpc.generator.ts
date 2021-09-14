@@ -49,10 +49,8 @@ export class GrpcGenerator {
       if (this.config?.load !== false) {
         const protoName: string =
           includeDirs === path.dirname(absoluteProtoFilePath)
-            ? absoluteProtoFilePath.split('/').pop() ?? ''
-            : absoluteProtoFilePath
-                .replace(includeDirs, '')
-                .replace(new RegExp(/^\//, 'g'), '');
+            ? path.basename(absoluteProtoFilePath) ?? ''
+            : path.relative(includeDirs, absoluteProtoFilePath);
         this.protos[protoName] = this.loadProto(
           absoluteProtoFilePath,
           includeDirs,

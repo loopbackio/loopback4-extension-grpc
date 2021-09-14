@@ -70,7 +70,8 @@ export interface GrpcComponentConfig {
     protoIgnores?: string[];
     /**
      * Defaults to parent directory
-     * You can specify an absolute path or a function that returns an absolut epath from the file path
+     * You can specify an absolute path or a function that returns an absolute path from the file path
+     * Be careful, you should return a valid path by using the path package
      */
     tsOutputPath?: string | ((path: string) => string);
     /**
@@ -82,6 +83,7 @@ export interface GrpcComponentConfig {
      * Defaults to parent directory of proto file
      * You can specify an absolute path or a function that returns an absolute path from the file path
      * This is also used to load protos
+     * Be careful, you should return a valid path by using the path package
      */
     protoPath?: string | ((path: string) => string);
     /**
