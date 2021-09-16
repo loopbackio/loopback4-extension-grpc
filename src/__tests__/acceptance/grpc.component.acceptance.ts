@@ -258,7 +258,7 @@ function givenApplication(options?: {
   tls?: Required<GrpcComponentConfig>['server']['tls'];
 }): Application {
   const grpcConfig: GrpcComponentConfig = {
-    server: {port: 5050, host: '0.0.0.0', tls: options?.tls},
+    server: {port: 5050, tls: options?.tls},
   };
   if (options?.sequence) {
     grpcConfig.sequence = options?.sequence;

@@ -21,7 +21,7 @@ export interface GrpcComponentConfig {
   server?: {
     /**
      * Defines gRPC server host address
-     * Defaults to 127.0.0.1
+     * Defaults to 0.0.0.0
      */
     host?: string;
     /**
