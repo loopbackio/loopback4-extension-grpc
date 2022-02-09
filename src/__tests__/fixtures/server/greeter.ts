@@ -1,25 +1,14 @@
 /* eslint-disable */
 import {FileDescriptorProto} from 'ts-proto-descriptors';
 import Long from 'long';
+import _m0 from 'protobufjs/minimal';
 import {
-  makeGenericClientConstructor,
-  ChannelCredentials,
-  ChannelOptions,
   UntypedServiceImplementation,
   handleUnaryCall,
   handleClientStreamingCall,
   handleServerStreamingCall,
   handleBidiStreamingCall,
-  Client,
-  ClientUnaryCall,
-  Metadata,
-  CallOptions,
-  ClientWritableStream,
-  ClientReadableStream,
-  ClientDuplexStream,
-  ServiceError,
 } from '@grpc/grpc-js';
-import _m0 from 'protobufjs/minimal';
 
 export const protobufPackage = 'greeterpackage';
 
@@ -33,7 +22,9 @@ export interface TestResponse {
   message: string;
 }
 
-const baseTestRequest: object = {name: ''};
+function createBaseTestRequest(): TestRequest {
+  return {name: ''};
+}
 
 export const TestRequest = {
   encode(
@@ -49,7 +40,7 @@ export const TestRequest = {
   decode(input: _m0.Reader | Uint8Array, length?: number): TestRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {...baseTestRequest} as TestRequest;
+    const message = createBaseTestRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -65,13 +56,9 @@ export const TestRequest = {
   },
 
   fromJSON(object: any): TestRequest {
-    const message = {...baseTestRequest} as TestRequest;
-    if (object.name !== undefined && object.name !== null) {
-      message.name = String(object.name);
-    } else {
-      message.name = '';
-    }
-    return message;
+    return {
+      name: isSet(object.name) ? String(object.name) : '',
+    };
   },
 
   toJSON(message: TestRequest): unknown {
@@ -80,18 +67,18 @@ export const TestRequest = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<TestRequest>): TestRequest {
-    const message = {...baseTestRequest} as TestRequest;
-    if (object.name !== undefined && object.name !== null) {
-      message.name = object.name;
-    } else {
-      message.name = '';
-    }
+  fromPartial<I extends Exact<DeepPartial<TestRequest>, I>>(
+    object: I,
+  ): TestRequest {
+    const message = createBaseTestRequest();
+    message.name = object.name ?? '';
     return message;
   },
 };
 
-const baseTestResponse: object = {message: ''};
+function createBaseTestResponse(): TestResponse {
+  return {message: ''};
+}
 
 export const TestResponse = {
   encode(
@@ -107,7 +94,7 @@ export const TestResponse = {
   decode(input: _m0.Reader | Uint8Array, length?: number): TestResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {...baseTestResponse} as TestResponse;
+    const message = createBaseTestResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -123,13 +110,9 @@ export const TestResponse = {
   },
 
   fromJSON(object: any): TestResponse {
-    const message = {...baseTestResponse} as TestResponse;
-    if (object.message !== undefined && object.message !== null) {
-      message.message = String(object.message);
-    } else {
-      message.message = '';
-    }
-    return message;
+    return {
+      message: isSet(object.message) ? String(object.message) : '',
+    };
   },
 
   toJSON(message: TestResponse): unknown {
@@ -138,13 +121,11 @@ export const TestResponse = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<TestResponse>): TestResponse {
-    const message = {...baseTestResponse} as TestResponse;
-    if (object.message !== undefined && object.message !== null) {
-      message.message = object.message;
-    } else {
-      message.message = '';
-    }
+  fromPartial<I extends Exact<DeepPartial<TestResponse>, I>>(
+    object: I,
+  ): TestResponse {
+    const message = createBaseTestResponse();
+    message.message = object.message ?? '';
     return message;
   },
 };
@@ -204,69 +185,6 @@ export interface GreeterServer extends UntypedServiceImplementation {
   serverStreamTest: handleServerStreamingCall<TestRequest, TestResponse>;
   bidiStreamTest: handleBidiStreamingCall<TestRequest, TestResponse>;
 }
-
-export interface GreeterClient extends Client {
-  /** Sends a greeting */
-  unaryTest(
-    request: TestRequest,
-    callback: (error: ServiceError | null, response: TestResponse) => void,
-  ): ClientUnaryCall;
-  unaryTest(
-    request: TestRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: TestResponse) => void,
-  ): ClientUnaryCall;
-  unaryTest(
-    request: TestRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: TestResponse) => void,
-  ): ClientUnaryCall;
-  clientStreamTest(
-    callback: (error: ServiceError | null, response: TestResponse) => void,
-  ): ClientWritableStream<TestRequest>;
-  clientStreamTest(
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: TestResponse) => void,
-  ): ClientWritableStream<TestRequest>;
-  clientStreamTest(
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: TestResponse) => void,
-  ): ClientWritableStream<TestRequest>;
-  clientStreamTest(
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: TestResponse) => void,
-  ): ClientWritableStream<TestRequest>;
-  serverStreamTest(
-    request: TestRequest,
-    options?: Partial<CallOptions>,
-  ): ClientReadableStream<TestResponse>;
-  serverStreamTest(
-    request: TestRequest,
-    metadata?: Metadata,
-    options?: Partial<CallOptions>,
-  ): ClientReadableStream<TestResponse>;
-  bidiStreamTest(): ClientDuplexStream<TestRequest, TestResponse>;
-  bidiStreamTest(
-    options: Partial<CallOptions>,
-  ): ClientDuplexStream<TestRequest, TestResponse>;
-  bidiStreamTest(
-    metadata: Metadata,
-    options?: Partial<CallOptions>,
-  ): ClientDuplexStream<TestRequest, TestResponse>;
-}
-
-export const GreeterClient = makeGenericClientConstructor(
-  GreeterService,
-  'greeterpackage.Greeter',
-) as unknown as {
-  new (
-    address: string,
-    credentials: ChannelCredentials,
-    options?: Partial<ChannelOptions>,
-  ): GreeterClient;
-};
 
 export interface ProtoMetadata {
   fileDescriptor: FileDescriptorProto;
@@ -383,6 +301,7 @@ type Builtin =
   | number
   | boolean
   | undefined;
+
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
@@ -393,7 +312,18 @@ export type DeepPartial<T> = T extends Builtin
   ? {[K in keyof T]?: DeepPartial<T[K]>}
   : Partial<T>;
 
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+export type Exact<P, I extends P> = P extends Builtin
+  ? P
+  : P &
+      {[K in keyof P]: Exact<P[K], I[K]>} &
+      Record<Exclude<keyof I, KeysOfUnion<P>>, never>;
+
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;
   _m0.configure();
+}
+
+function isSet(value: any): boolean {
+  return value !== null && value !== undefined;
 }

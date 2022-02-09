@@ -60,7 +60,7 @@
     "debug": "^4.3.2",
     "glob": "^7.1.7",
     "protobufjs": "^6.11.2",
-    "ts-proto": "^1.82.5"
+    "ts-proto": "^1.104.0"
   },
   "devDependencies": {
     "@loopback/build": "^7.0.0",
