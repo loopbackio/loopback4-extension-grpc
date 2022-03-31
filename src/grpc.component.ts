@@ -16,7 +16,7 @@ import {ServerProvider} from './providers/server.provider';
 import {GrpcServer} from './grpc.server';
 import {GrpcSequence} from './grpc.sequence';
 import {GeneratorProvider} from './providers/generator.provider';
-import {GrpcService} from './types';
+import {GrpcComponentConfig} from './types';
 /**
  * Grpc Component for LoopBack 4.
  */
@@ -37,19 +37,20 @@ export class GrpcComponent implements Component {
 
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) app: Application,
-    @inject(GrpcBindings.CONFIG) config: GrpcService,
+    @inject(GrpcBindings.CONFIG) config: GrpcComponentConfig,
   ) {
     // Set default configuration for this component
-    config = Object.assign(
+    const serverConfig: GrpcComponentConfig['server'] = Object.assign(
       {
-        host: '127.0.0.1',
+        host: '0.0.0.0',
         port: 3000,
       },
-      config,
+      config.server ?? {},
     );
+
     // Bind host, port, proto path, package and sequence
-    app.bind(GrpcBindings.HOST).to(config.host);
-    app.bind(GrpcBindings.PORT).to(config.port);
+    app.bind(GrpcBindings.HOST).to(serverConfig.host);
+    app.bind(GrpcBindings.PORT).to(serverConfig.port);
 
     app
       .bind(GrpcBindings.GRPC_SEQUENCE)

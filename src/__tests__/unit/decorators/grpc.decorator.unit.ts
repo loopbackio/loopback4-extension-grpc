@@ -5,39 +5,19 @@
 
 import {MetadataInspector} from '@loopback/metadata';
 import {expect} from '@loopback/testlab';
-import {grpc, GRPC_METHODS} from '../../..';
-import {
-  Greeter,
-  HelloReply,
-  HelloRequest,
-  TestRequest,
-  TestReply,
-} from '../../acceptance/greeter.proto';
 
-describe('@rpc decorator', () => {
+import {GRPC_METHODS} from '../../../decorators/grpc.decorator';
+import GreeterController from '../../fixtures/server/greeter.controller';
+
+describe('@grpc decorator', () => {
   it('defines reflection metadata for rpc method', () => {
-    class GreeterCtrl implements Greeter.Service {
-      @grpc(Greeter.SayHello)
-      sayHello(request: HelloRequest): HelloReply {
-        return {message: `hello ${request.name}`};
-      }
-
-      @grpc(Greeter.SayTest)
-      sayTest(request: TestRequest): TestReply {
-        return {
-          message: 'Test ' + request.name,
-        };
-      }
-
-      helper(): boolean {
-        return true;
-      }
-    }
-
     const controllerMethods = MetadataInspector.getAllMethodMetadata(
       GRPC_METHODS,
-      GreeterCtrl.prototype,
+      GreeterController.prototype,
     );
-    expect(controllerMethods).to.have.property('sayHello');
+    expect(controllerMethods).to.have.property('unaryTest');
+    expect(controllerMethods).to.have.property('clientStreamTest');
+    expect(controllerMethods).to.have.property('serverStreamTest');
+    expect(controllerMethods).to.have.property('bidiStreamTest');
   });
 });

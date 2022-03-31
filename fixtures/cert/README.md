@@ -1,0 +1,1 @@
+The CA has been generated to last 3650 days. The client CSR and server CSR have a challenge password: `grpc`. Both server and client certificates have been generated to last 3650 days. These certificates are only to be used for purposes of tests.
